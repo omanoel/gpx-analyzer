@@ -23,7 +23,7 @@ export class PerspectiveCameraService {
   public initialize(
     width: number,
     height: number,
-    positions: number[] = [1, 1, 1]
+    coord: number
   ): THREE.PerspectiveCamera {
     const camera = new THREE.PerspectiveCamera(
       PerspectiveCameraService.VIEW_ANGLE,
@@ -31,9 +31,9 @@ export class PerspectiveCameraService {
       PerspectiveCameraService.NEAR,
       PerspectiveCameraService.FAR
     );
-    camera.translateX(positions[0]);
-    camera.translateY(positions[1]);
-    camera.translateZ(positions[2]);
+    camera.translateX(coord);
+    camera.translateY(coord);
+    camera.translateZ(coord);
     camera.up = new THREE.Vector3(0, 0, 1);
     this._updateAspect(camera, width, height);
     return camera;

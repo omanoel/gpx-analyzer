@@ -1,1 +1,24 @@
 <app-map [model]="mainComponentModel"></app-map>
+<app-tools [model]="mainComponentModel"></app-tools>
+<app-indicators [model]="mainComponentModel"></app-indicators>
+<div class="bottom-menu">
+  <a
+    (click)="displayHelp(true)"
+    title="{{ 'COMMON.HOW_TO_NAVIGATE' | translate }}"
+    ><img src="./assets/help.png"
+  /></a>
+  <a
+    href="https://github.com/omanoel/gpx-analyzer"
+    title="{{ 'COMMON.GITHUB' | translate }}"
+    ><img src="./assets/GitHub-Mark-Light-32px.png"
+  /></a>
+</div>
+<div class="help" *ngIf="isHelpDisplayed">
+  <p>* {{ 'NAVIGATE.ROTATE' | translate }}</p>
+  <p>* {{ 'NAVIGATE.TRANSLATE' | translate }}</p>
+  <p>* {{ 'NAVIGATE.ZOOM' | translate }}</p>
+  <p>* {{ 'NAVIGATE.GOTO' | translate }}</p>
+  <p class="close">
+    <a (click)="displayHelp(false)">{{ 'COMMON.CLOSE' | translate }}</a>
+  </p>
+</div>

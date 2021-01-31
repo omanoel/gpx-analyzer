@@ -11,6 +11,9 @@
     "COLLAPSE": "Collapse this panel",
     "EXPAND": "Expand this panel"
   },
+  "TOOLS": {
+    "Z_SCALE": "Scale factor along z axis"
+  },
   "CATALOGS": {
     "FILTERS": "Show / modify filters",
     "GOTO_NEXT": "See next object",
