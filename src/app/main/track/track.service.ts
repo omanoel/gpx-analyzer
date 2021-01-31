@@ -1,166 +1,132 @@
 import { Injectable } from '@angular/core';
 import * as THREE from 'three';
 import { MainComponentModel } from '../main.component.model';
-
-import * as proj4x from 'proj4';
-import { TrackPoint } from './track.model';
-const proj4 = (proj4x as any).default;
+import { SceneService } from '../scene/scene.service';
+import { TrackPoint, TrackStatistics } from './track.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TrackService {
-  constructor() {
+  constructor(private _sceneService: SceneService) {
     // Empty
   }
 
   public build3dTracks(mainComponentModel: MainComponentModel): void {
-    mainComponentModel.tracks.forEach((t) => {
-      t.children.length = 0;
-      t.add(this._build3dTrack(t, mainComponentModel.zScale));
-      mainComponentModel.scene.add(t);
-    });
+    if (
+      mainComponentModel.firstPosition === null ||
+      (mainComponentModel.firstPosition.x === 0 &&
+        mainComponentModel.firstPosition.y === 0 &&
+        mainComponentModel.firstPosition.z === 0)
+    ) {
+      mainComponentModel.firstPosition = new THREE.Vector3(0, 0, 0);
+      if (mainComponentModel.gpxFiles.length > 0) {
+        mainComponentModel.firstPosition.setX(
+          mainComponentModel.gpxFiles[0].statistics.trkPoints[0].x
+        );
+        mainComponentModel.firstPosition.setY(
+          mainComponentModel.gpxFiles[0].statistics.trkPoints[0].y
+        );
+        mainComponentModel.firstPosition.setZ(
+          mainComponentModel.gpxFiles[0].statistics.trkPoints[0].altitude
+        );
+      }
+    }
+
+    this._removeTracks(mainComponentModel);
+    this._addTracks(mainComponentModel, mainComponentModel.firstPosition);
   }
 
-  private _build3dTrack(track: THREE.Object3D, zScale: number): THREE.Object3D {
+  private _addTracks(
+    mainComponentModel: MainComponentModel,
+    origin: THREE.Vector3
+  ): void {
+    const obj3dsToAdd: THREE.Object3D[] = [];
+    mainComponentModel.gpxFiles.forEach((gpxFile) => {
+      if (
+        !this._sceneService
+          .getTack3ds(mainComponentModel.scene)
+          .find((obj3d) => gpxFile.statistics.title === obj3d.name)
+      ) {
+        obj3dsToAdd.push(
+          this._build3dTrack(
+            gpxFile.statistics,
+            mainComponentModel.zScale,
+            origin
+          )
+        );
+      }
+    });
+    if (obj3dsToAdd.length > 0) {
+      mainComponentModel.scene.add(...obj3dsToAdd);
+    }
+  }
+
+  private _removeTracks(mainComponentModel: MainComponentModel): void {
+    const obj3dsToRemove: THREE.Object3D[] = [];
+    this._sceneService.getTack3ds(mainComponentModel.scene).forEach((obj3d) => {
+      if (
+        !mainComponentModel.gpxFiles.find(
+          (gpxFile) => gpxFile.statistics.title === obj3d.name
+        )
+      ) {
+        obj3dsToRemove.push(obj3d);
+      }
+    });
+    if (obj3dsToRemove.length > 0) {
+      mainComponentModel.scene.remove(...obj3dsToRemove);
+    }
+  }
+
+  private _build3dTrack(
+    gpxStatistics: TrackStatistics,
+    zScale: number,
+    origin: THREE.Vector3
+  ): THREE.Object3D {
+    const track = new THREE.Object3D();
+    track.name = gpxStatistics.title;
     const track3dChildren = new THREE.Object3D();
-    const color = 0xffffff;
+    const colors: number[] = gpxStatistics.colors;
+    const r = colors[0] / 255;
+    const g = colors[1] / 255;
+    const b = colors[2] / 255;
+
     const materialTrackSeg = new THREE.LineBasicMaterial({
-      color: color,
+      color: new THREE.Color(r, g, b),
       transparent: true,
-      opacity: 0.8
+      opacity: 1
     });
     const meshes: THREE.Mesh[] = [];
     const points: THREE.Vector3[] = [];
-    const trackPoints: TrackPoint[] = [];
-    let length = 0;
-    let c = 0;
-    const jsonData = track.userData['gpx'];
-    if (jsonData?.gpx?.trk?.trkseg?.trkpt) {
-      const lon0 = +jsonData.gpx.trk.trkseg.trkpt[0]['@']['@_lon'];
-      const lat0 = +jsonData.gpx.trk.trkseg.trkpt[0]['@']['@_lat'];
-      const z0 = +jsonData.gpx.trk.trkseg.trkpt[0]['ele'];
-      const datetime0 = new Date(
-        jsonData.gpx.trk.trkseg.trkpt[0]['time']
-      ).getTime();
-      const xy0 = this._transformLonLatInEN(lon0, lat0);
-      const xyzPrevious = [xy0[0], xy0[1], z0];
-      let datetimePrevious = datetime0;
-      let r = 1;
-      let g = 1;
-      let b = 1;
+    const deltaXOrigin = gpxStatistics.trkPoints[0].x - origin.x;
+    const deltaYOrigin = gpxStatistics.trkPoints[0].y - origin.y;
+    const deltaZOrigin = gpxStatistics.trkPoints[0].altitude - origin.z;
 
-      jsonData.gpx.trk.trkseg.trkpt.forEach((s: any) => {
-        const trackPoint: TrackPoint = {
-          lon: null,
-          lat: null,
-          altitude: null,
-          x: null,
-          y: null,
-          datetime: null,
-          speed: null,
-          deltaX: null,
-          deltaY: null,
-          deltaZ: null,
-          deltaDistance: null,
-          deltaDatetime: null,
-          deltaX0: null,
-          deltaY0: null,
-          deltaZ0: null,
-          deltaDistance0: null,
-          deltaDatetime0: null,
-          temperature: null,
-          windSpeed: null,
-          windDirection: null
-        };
-        trackPoint.lon = +s['@']['@_lon'];
-        trackPoint.lat = +s['@']['@_lat'];
-        trackPoint.altitude = +s['ele'];
-        trackPoint.datetime = new Date(s['time']).getTime();
-        trackPoint.deltaDatetime0 = trackPoint.datetime - datetime0;
-        trackPoint.deltaDatetime = trackPoint.datetime - datetimePrevious;
-        const xy = this._transformLonLatInEN(trackPoint.lon, trackPoint.lat);
-        trackPoint.x = xy[0];
-        trackPoint.y = xy[1];
-        trackPoint.deltaX0 = trackPoint.x - xy0[0];
-        trackPoint.deltaY0 = trackPoint.y - xy0[1];
-        trackPoint.deltaZ0 = trackPoint.altitude - z0;
-        trackPoint.deltaX = trackPoint.x - xyzPrevious[0];
-        trackPoint.deltaY = trackPoint.y - xyzPrevious[1];
-        trackPoint.deltaZ = trackPoint.altitude - xyzPrevious[2];
-        const deltaXDistance = trackPoint.x - xyzPrevious[0];
-        const deltaYDistance = trackPoint.y - xyzPrevious[1];
-        trackPoint.deltaDistance = Math.sqrt(
-          deltaXDistance * deltaXDistance + deltaYDistance * deltaYDistance
-        );
-        trackPoint.speed =
-          trackPoint.deltaDatetime > 0
-            ? (trackPoint.deltaDistance / trackPoint.deltaDatetime) * 1000
-            : 0;
-        length += trackPoint.deltaDistance;
-        trackPoint.deltaDistance0 = length;
-        points.push(
-          new THREE.Vector3(
-            trackPoint.deltaX0,
-            trackPoint.deltaY0,
-            trackPoint.deltaZ0 * zScale
-          )
-        );
-        if (Math.floor(length / 1000) !== c) {
-          r = 1;
-          g = r === 1 ? 0 : 1;
-          b = r === 1 ? 0 : 1;
-          c = Math.floor(length / 1000);
-        }
-        const geometry = new THREE.BoxGeometry(1, 1, 1);
-        geometry.translate(
-          trackPoint.deltaX0,
-          trackPoint.deltaY0,
-          trackPoint.deltaZ0 * zScale
-        );
-        const material = new THREE.MeshBasicMaterial({
-          color: new THREE.Color(r, g, b)
-        });
-        meshes.push(new THREE.Mesh(geometry, material));
-        xyzPrevious[0] = trackPoint.x;
-        xyzPrevious[1] = trackPoint.y;
-        xyzPrevious[2] = trackPoint.altitude;
-        datetimePrevious = trackPoint.datetime;
-        length = trackPoint.deltaDistance0;
-        trackPoints.push(trackPoint);
+    gpxStatistics.trkPoints.forEach((tkpt: TrackPoint) => {
+      points.push(
+        new THREE.Vector3(
+          deltaXOrigin + tkpt.deltaX0,
+          deltaYOrigin + tkpt.deltaY0,
+          deltaZOrigin + tkpt.deltaZ0 * zScale
+        )
+      );
+      const geometry = new THREE.BoxGeometry(1, 1, 1);
+      geometry.translate(
+        deltaXOrigin + tkpt.deltaX0,
+        deltaYOrigin + tkpt.deltaY0,
+        deltaZOrigin + tkpt.deltaZ0 * zScale
+      );
+      const material = new THREE.MeshBasicMaterial({
+        color: new THREE.Color(r, g, b)
       });
-    }
+      meshes.push(new THREE.Mesh(geometry, material));
+    });
+
     const geometry = new THREE.BufferGeometry().setFromPoints(points);
     track3dChildren.add(new THREE.Line(geometry, materialTrackSeg));
     track3dChildren.add(...meshes);
-    track.userData['stats'] = {
-      distance: trackPoints[trackPoints.length - 1].deltaDistance0,
-      delayTotal: trackPoints[trackPoints.length - 1].deltaDatetime0,
-      delayMove: this._buildDelayMove(trackPoints),
-      points: trackPoints.length,
-      trkPoints: trackPoints
-    };
-    return track3dChildren;
-  }
-
-  private _transformLonLatInEN(lon: number, lat: number): number[] {
-    this._defLambert93();
-    return proj4('EPSG:2154').forward([lon, lat]);
-    // .map((item: number) => Math.round(item * 100) / 100);
-  }
-
-  private _buildDelayMove(trackPoints: TrackPoint[]): number {
-    let delay = 0;
-    trackPoints
-      .filter((p) => p.speed > 0.2)
-      .forEach((p) => (delay += p.deltaDatetime));
-    return delay;
-  }
-
-  private _defLambert93(): void {
-    proj4.defs(
-      'EPSG:2154',
-      '+proj=lcc +lat_1=49 +lat_2=44 +lat_0=46.5 +lon_0=3 +x_0=700000 +y_0=6600000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs'
-    );
+    track.add(track3dChildren);
+    track.userData['stats'] = gpxStatistics;
+    return track;
   }
 }

@@ -1,20 +1,12 @@
 <div class="tools">
   <form [formGroup]="toolsForm">
     <div *ngFor="let _trk of tracks">
-      {{ _trk.userData['stats'].distance / 1000 }}<br />
+      {{ _trk.userData['stats'].distance }}<br />
       {{ _trk.userData['stats'].points }}<br />
       {{ _trk.userData['stats'].delayTotal / 1000 / 60 }} min<br />
       {{ _trk.userData['stats'].delayMove / 1000 / 60 }} min<br />
-      {{
-        (_trk.userData['stats'].distance * 3600) /
-          _trk.userData['stats'].delayTotal
-      }}
-      km/h<br />
-      {{
-        (_trk.userData['stats'].distance * 3600) /
-          _trk.userData['stats'].delayMove
-      }}
-      km/h<br />
+      {{ _trk.userData['stats'].speedTotal }} km/h<br />
+      {{ _trk.userData['stats'].speedMove }} km/h<br />
     </div>
     <div>
       <input

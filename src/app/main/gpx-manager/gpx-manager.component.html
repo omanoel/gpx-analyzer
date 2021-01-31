@@ -1,0 +1,33 @@
+<div>
+  <h1>
+    <i
+      class="i-button eva eva-move"
+      (click)="move()"
+      title="Move this panel"
+    ></i>
+    Gpx files
+    <i
+      class="right i-button eva eva-plus"
+      (click)="displayAdd = !displayAdd"
+      title="Add"
+    ></i>
+  </h1>
+  <p *ngFor="let gpxFile of model?.gpxFiles">
+    <i
+      title="Delete"
+      (click)="delete(gpxFile.id)"
+      class="i-button eva eva-trash"
+    ></i
+    ><i
+      title="See"
+      (click)="see(gpxFile.id)"
+      class="i-button eva"
+      [ngClass]="{
+        'eva-eye': isVisible(gpxFile.id),
+        'eva-eye-off': !isVisible(gpxFile.id)
+      }"
+    ></i
+    ><span [style.color]="getRgbColor(gpxFile)">{{ gpxFile.title }}</span>
+  </p>
+</div>
+<app-files-uploader *ngIf="displayAdd" (onAdd)="refresh()"></app-files-uploader>

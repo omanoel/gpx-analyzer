@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "gpx-analyser": {
+    "gpx-analyzer": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -20,7 +20,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/gpx-analyser",
+            "outputPath": "dist/gpx-analyzer",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -31,7 +31,8 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.scss"
+              "src/styles.scss",
+              "src/assets/icons/eva-icons.css"
             ],
             "scripts": []
           },
@@ -53,8 +54,8 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kb",
-                  "maximumError": "1mb"
+                  "maximumWarning": "2mb",
+                  "maximumError": "4mb"
                 },
                 {
                   "type": "anyComponentStyle",
@@ -68,18 +69,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "gpx-analyser:build"
+            "browserTarget": "gpx-analyzer:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "gpx-analyser:build:production"
+              "browserTarget": "gpx-analyzer:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "gpx-analyser:build"
+            "browserTarget": "gpx-analyzer:build"
           }
         },
         "lint": {
@@ -98,5 +99,5 @@
       }
     }
   },
-  "defaultProject": "gpx-analyser"
+  "defaultProject": "gpx-analyzer"
 }

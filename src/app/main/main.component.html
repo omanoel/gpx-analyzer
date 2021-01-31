@@ -1,6 +1,11 @@
 <app-map [model]="mainComponentModel"></app-map>
+<app-menu [model]="mainComponentModel"></app-menu>
 <app-tools [model]="mainComponentModel"></app-tools>
 <app-indicators [model]="mainComponentModel"></app-indicators>
+<app-gpx-manager
+  [model]="mainComponentModel"
+  [hidden]="!mainComponentModel.menu.isGpxFilesDisplayed"
+></app-gpx-manager>
 <div class="bottom-menu">
   <a
     (click)="displayHelp(true)"

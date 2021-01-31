@@ -19,10 +19,14 @@ export class ReferentielService {
   public initialize(camera: THREE.PerspectiveCamera): ReferentielModel {
     const color = 0xffffff;
     const distance = 1000; // camera.position.distanceTo(new THREE.Vector3(0, 0, 0));
+    const referentiel3d = new THREE.Object3D();
+    referentiel3d.add(
+      ...this._buildObjects(color, distance, new THREE.Vector3(0, 0, 0))
+    );
     return {
       origin: new THREE.Vector3(0, 0, 0),
       distReference: distance,
-      objects: this._buildObjects(color, distance, new THREE.Vector3(0, 0, 0))
+      objects: referentiel3d
     };
   }
 
@@ -32,7 +36,7 @@ export class ReferentielService {
     camera: THREE.PerspectiveCamera,
     center: THREE.Vector3
   ): void {
-    const dist = camera.position.distanceTo(new THREE.Vector3(0, 0, 0));
+    // const dist = camera.position.distanceTo(new THREE.Vector3(0, 0, 0));
     if (!this._init) {
       this._init = true;
       this._updateObjects(referentiel, scene);
@@ -55,18 +59,17 @@ export class ReferentielService {
     referentiel: ReferentielModel,
     scene: THREE.Scene
   ): void {
-    for (const refObject of referentiel.objects) {
-      scene.remove(refObject);
-    }
+    scene.remove(referentiel.objects);
     const color = 0xffffff;
-    referentiel.objects = this._buildObjects(
-      color,
-      referentiel.distReference,
-      referentiel.origin
+    referentiel.objects.children.length = 0;
+    referentiel.objects.add(
+      ...this._buildObjects(
+        color,
+        referentiel.distReference,
+        referentiel.origin
+      )
     );
-    for (const refObject of referentiel.objects) {
-      scene.add(refObject);
-    }
+    scene.add(referentiel.objects);
   }
 
   private _buildObjects(
