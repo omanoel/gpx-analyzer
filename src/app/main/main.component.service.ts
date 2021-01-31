@@ -7,6 +7,10 @@ import { RaycasterService } from './raycaster/raycaster.service';
 import { SceneService } from './scene/scene.service';
 import { TrackballControlsService } from './trackball-controls/trackball-controls.service';
 import { MainComponentModel } from './main.component.model';
+import { ReferentielService } from './referentiel/referentiel.service';
+import { GpxLoaderService } from './gpx-loader/gpx-loader.service';
+import { TargetService } from './target/target.service';
+import { TrackService } from './track/track.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +21,11 @@ export class MainComponentService {
     private _perspectiveCameraService: PerspectiveCameraService,
     private _trackballControlsService: TrackballControlsService,
     private _raycasterService: RaycasterService,
-    private _sceneService: SceneService
+    private _sceneService: SceneService,
+    private _referentielService: ReferentielService,
+    private _gpxLoaderService: GpxLoaderService,
+    private _targetService: TargetService,
+    private _trackService: TrackService
   ) {}
 
   public initModel(element: ElementRef): MainComponentModel {
@@ -28,6 +36,7 @@ export class MainComponentService {
       frameId: null,
       element: element,
       camera: null,
+      referentiel: null,
       scene: null,
       trackballControls: null,
       raycaster: null,
@@ -47,7 +56,12 @@ export class MainComponentService {
       dateMax: 10000,
       dateCurrent: 2000,
       showProperMotion: false,
-      changeOnShowProperMotion: false
+      changeOnShowProperMotion: false,
+      tracks: [],
+      target: null,
+      countObjects: 0,
+      zScale: 1,
+      needsUpdate: false
     };
   }
 
@@ -55,8 +69,15 @@ export class MainComponentService {
     //
     mainComponentModel.camera = this._perspectiveCameraService.initialize(
       mainComponentModel.width,
-      mainComponentModel.height
+      mainComponentModel.height,
+      50000
     );
+    //
+    mainComponentModel.referentiel = this._referentielService.initialize(
+      mainComponentModel.camera
+    );
+    //
+    mainComponentModel.target = this._targetService.initialize();
     //
     mainComponentModel.scene = this._sceneService.initialize();
     //
@@ -78,10 +99,21 @@ export class MainComponentService {
     mainComponentModel.trackballControls = this._trackballControlsService.initialize();
     this._trackballControlsService.setupControls(mainComponentModel);
 
-    mainComponentModel.camera.position.y = 1;
-    mainComponentModel.camera.position.z = 1;
+    mainComponentModel.camera.position.y = 50000;
+    mainComponentModel.camera.position.z = 50000;
     //this.fog =  new THREE.FogExp2( 0xffffff, 0.015 );
     mainComponentModel.scene.add(mainComponentModel.camera);
+    //
+    this._targetService.create(
+      mainComponentModel.target,
+      mainComponentModel.scene,
+      mainComponentModel.trackballControls.controls.target
+    );
+    this._gpxLoaderService
+      .load$(mainComponentModel, '/assets/gpx/track1.gpx')
+      .then(() => {
+        this._afterInit(mainComponentModel);
+      });
   }
 
   public resetWidthHeight(
@@ -112,78 +144,98 @@ export class MainComponentService {
   }
 
   public onChanges(
-    threeComponentModel: MainComponentModel,
+    mainComponentModel: MainComponentModel,
     changes: SimpleChanges
   ): void {
     //
     const widthChange = changes.width && changes.width.currentValue;
     const heightChange = changes.height && changes.height.currentValue;
     if (widthChange || heightChange) {
-      threeComponentModel.renderer.setSize(
-        threeComponentModel.width,
-        threeComponentModel.height
+      mainComponentModel.renderer.setSize(
+        mainComponentModel.width,
+        mainComponentModel.height
       );
       this._perspectiveCameraService.updateCamera(
-        threeComponentModel.camera,
-        threeComponentModel.width,
-        threeComponentModel.height
+        mainComponentModel.camera,
+        mainComponentModel.width,
+        mainComponentModel.height
       );
     }
   }
 
-  private _animate(threeComponentModel: MainComponentModel): void {
+  private _animate(mainComponentModel: MainComponentModel): void {
     /*
     requestAnimationFrame(() => this.animate(threeComponentModel));
     this.render(threeComponentModel);
     */
     this._ngZone.runOutsideAngular(() => {
       if (document.readyState !== 'loading') {
-        this._render(threeComponentModel);
+        this._render(mainComponentModel);
       } else {
         window.addEventListener('DOMContentLoaded', () => {
-          this._render(threeComponentModel);
+          this._render(mainComponentModel);
         });
       }
     });
   }
 
-  private _render(threeComponentModel: MainComponentModel): void {
-    threeComponentModel.frameId = requestAnimationFrame(() => {
-      this._render(threeComponentModel);
+  private _render(mainComponentModel: MainComponentModel): void {
+    mainComponentModel.frameId = requestAnimationFrame(() => {
+      this._render(mainComponentModel);
     });
     //
     this._trackballControlsService.updateControls(
-      threeComponentModel.trackballControls
+      mainComponentModel.trackballControls
     );
+    //
+    this._referentielService.update(
+      mainComponentModel.referentiel,
+      mainComponentModel.scene,
+      mainComponentModel.camera,
+      mainComponentModel.target.axesHelper.position
+    );
+    //
+    this._targetService.updateAxesHelper(
+      mainComponentModel.target,
+      mainComponentModel.trackballControls.controls.target,
+      mainComponentModel.camera
+    );
+    //
+    if (mainComponentModel.needsUpdate) {
+      this._trackService.build3dTracks(mainComponentModel);
+      mainComponentModel.needsUpdate = false;
+    }
     //
     if (
-      !this._perspectiveCameraService.isMoving(threeComponentModel) ||
-      threeComponentModel.changeOnShowProperMotion
+      !this._perspectiveCameraService.isMoving(mainComponentModel) ||
+      mainComponentModel.changeOnShowProperMotion
     ) {
-      threeComponentModel.changeOnShowProperMotion = false;
+      mainComponentModel.changeOnShowProperMotion = false;
     }
     // this._objectsService.updateMovementObjects(threeComponentModel);
-    if (!threeComponentModel.showProperMotion) {
-      threeComponentModel.dateCurrent = 2000;
+    if (!mainComponentModel.showProperMotion) {
+      mainComponentModel.dateCurrent = 2000;
     }
     //
-    this._findIntersection(threeComponentModel);
+    this._findIntersection(mainComponentModel);
     //
     //
-    threeComponentModel.renderer.render(
-      threeComponentModel.scene,
-      threeComponentModel.camera
+    mainComponentModel.renderer.render(
+      mainComponentModel.scene,
+      mainComponentModel.camera
     );
   }
 
-  private _findIntersection(threeComponentModel: MainComponentModel): void {
-    threeComponentModel.raycaster.setFromCamera(
-      threeComponentModel.mouse,
-      threeComponentModel.camera
+  private _findIntersection(mainComponentModel: MainComponentModel): void {
+    mainComponentModel.raycaster.setFromCamera(
+      mainComponentModel.mouse,
+      mainComponentModel.camera
     );
   }
 
-  private _afterInitCatalog(threeComponentModel: MainComponentModel): void {
-    this._animate(threeComponentModel);
+  private _afterInit(mainComponentModel: MainComponentModel): void {
+    mainComponentModel.countObjects = mainComponentModel.tracks.length;
+    mainComponentModel.needsUpdate = true;
+    this._animate(mainComponentModel);
   }
 }
