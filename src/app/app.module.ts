@@ -6,7 +6,7 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { environment } from 'src/environments/environment';
 
 import { AppComponent } from './app.component';
-import { MainModule } from './main/main.module';
+import { MainModule } from './@main/main.module';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(httpClient: HttpClient): TranslateHttpLoader {
