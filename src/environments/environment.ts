@@ -4,7 +4,8 @@
 
 export const environment = {
   production: false,
-  assetsPath: '/assets/i18n/'
+  assetsPath: '/assets/i18n/',
+  gpxPath: '/assets/gpx/'
 };
 
 /*

@@ -1,4 +1,5 @@
 export const environment = {
   production: true,
-  assetsPath: '/assets/i18n/'
+  assetsPath: '/__experimentations/gpx-analyzer/assets/i18n/',
+  gpxPath: '/__experimentations/gpx-analyzer/assets/gpx/'
 };

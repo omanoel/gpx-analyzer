@@ -1,8 +1,26 @@
 export interface TrackStatistics {
+  title: string;
   distance: number;
-  delay: number;
+  delayTotal: number;
+  delayMove: number;
+  speedTotal: number;
+  speedMove: number;
+  speedMax: number;
+  altitudeMin: number;
+  altitudeMax: number;
+  ascendingElevation: number;
+  descendingElevation: number;
+  lonMin: number;
+  lonMax: number;
+  latMin: number;
+  latMax: number;
+  xMin: number;
+  xMax: number;
+  yMin: number;
+  yMax: number;
   points: number;
   trkPoints: TrackPoint[];
+  colors: number[];
 }
 
 export interface TrackPoint {

@@ -33,6 +33,6 @@ export class ToolsComponent implements OnInit, OnDestroy {
   }
 
   public get tracks(): THREE.Object3D[] {
-    return this.model.tracks;
+    return this.model.track3ds;
   }
 }

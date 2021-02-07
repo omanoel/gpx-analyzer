@@ -1,6 +1,6 @@
 {
   "name": "gpx-analyzer",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A GPX analyzer",
   "license": "MIT",
   "contributors": [
@@ -25,6 +25,7 @@
     "@ngx-translate/core": "13.0.0",
     "@ngx-translate/http-loader": "6.0.0",
     "core-js": "3.8.3",
+    "dexie": "3.0.3",
     "fast-xml-parser": "3.17.6",
     "proj4": "2.7.0",
     "rxjs": "6.6.3",
@@ -49,6 +50,7 @@
     "eslint": "7.18.0",
     "eslint-config-prettier": "7.2.0",
     "eslint-plugin-prettier": "3.3.1",
+    "eva-icons": "1.1.3",
     "postcss": "8.2.4",
     "prettier": "2.2.1",
     "ts-node": "9.1.1",

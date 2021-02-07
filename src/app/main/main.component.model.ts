@@ -5,6 +5,8 @@ import { ElementRef } from '@angular/core';
 import { TrackballControlsModel } from './trackball-controls/trackball-controls.model';
 import { ReferentielModel } from './referentiel/referentiel.model';
 import { TargetModel } from './target/target.model';
+import { GpxFile } from './dexie-db/gpx-file.model';
+import { MenuModel } from './menu/menu.model';
 
 export interface MainComponentModel {
   element: ElementRef;
@@ -32,11 +34,14 @@ export interface MainComponentModel {
   dateCurrent: number;
   showProperMotion: boolean;
   changeOnShowProperMotion: boolean;
-  tracks: THREE.Object3D[];
+  track3ds: THREE.Object3D[];
   target: TargetModel;
   countObjects: number;
   zScale: number;
   needsUpdate: boolean;
+  gpxFiles: GpxFile[];
+  firstPosition: THREE.Vector3;
+  menu: MenuModel;
 }
 
 export interface ObjectOver {

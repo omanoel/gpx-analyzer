@@ -8,7 +8,6 @@ import { SceneService } from './scene/scene.service';
 import { TrackballControlsService } from './trackball-controls/trackball-controls.service';
 import { MainComponentModel } from './main.component.model';
 import { ReferentielService } from './referentiel/referentiel.service';
-import { GpxLoaderService } from './gpx-loader/gpx-loader.service';
 import { TargetService } from './target/target.service';
 import { TrackService } from './track/track.service';
 
@@ -23,7 +22,6 @@ export class MainComponentService {
     private _raycasterService: RaycasterService,
     private _sceneService: SceneService,
     private _referentielService: ReferentielService,
-    private _gpxLoaderService: GpxLoaderService,
     private _targetService: TargetService,
     private _trackService: TrackService
   ) {}
@@ -57,11 +55,16 @@ export class MainComponentService {
       dateCurrent: 2000,
       showProperMotion: false,
       changeOnShowProperMotion: false,
-      tracks: [],
+      track3ds: [],
       target: null,
       countObjects: 0,
       zScale: 1,
-      needsUpdate: false
+      needsUpdate: false,
+      gpxFiles: [],
+      firstPosition: null,
+      menu: {
+        isGpxFilesDisplayed: false
+      }
     };
   }
 
@@ -96,7 +99,6 @@ export class MainComponentService {
       Math.floor(window.devicePixelRatio)
     );
 
-    mainComponentModel.trackballControls = this._trackballControlsService.initialize();
     this._trackballControlsService.setupControls(mainComponentModel);
 
     mainComponentModel.camera.position.y = 50000;
@@ -109,11 +111,7 @@ export class MainComponentService {
       mainComponentModel.scene,
       mainComponentModel.trackballControls.controls.target
     );
-    this._gpxLoaderService
-      .load$(mainComponentModel, '/assets/gpx/track1.gpx')
-      .then(() => {
-        this._afterInit(mainComponentModel);
-      });
+    this._afterInit(mainComponentModel);
   }
 
   public resetWidthHeight(
@@ -202,7 +200,13 @@ export class MainComponentService {
     );
     //
     if (mainComponentModel.needsUpdate) {
+      // console.log('firstPosition', mainComponentModel.firstPosition);
+      // console.log('camera.position', mainComponentModel.camera.position);
+      // console.log('camera.up', mainComponentModel.camera.up);
       this._trackService.build3dTracks(mainComponentModel);
+      mainComponentModel.countObjects = this._sceneService.getTack3ds(
+        mainComponentModel.scene
+      ).length;
       mainComponentModel.needsUpdate = false;
     }
     //
@@ -234,8 +238,32 @@ export class MainComponentService {
   }
 
   private _afterInit(mainComponentModel: MainComponentModel): void {
-    mainComponentModel.countObjects = mainComponentModel.tracks.length;
     mainComponentModel.needsUpdate = true;
     this._animate(mainComponentModel);
+  }
+
+  private _getOrigin(mainComponentModel: MainComponentModel): THREE.Vector3 {
+    const origin = new THREE.Vector3();
+    let minX = Number.POSITIVE_INFINITY;
+    let minY = Number.POSITIVE_INFINITY;
+    let maxX = Number.NEGATIVE_INFINITY;
+    let maxY = Number.NEGATIVE_INFINITY;
+    if (mainComponentModel.gpxFiles.length > 0) {
+      mainComponentModel.gpxFiles.forEach((gpxFile) => {
+        minX = minX < gpxFile.statistics.xMin ? minX : gpxFile.statistics.xMin;
+        minY = minY < gpxFile.statistics.yMin ? minY : gpxFile.statistics.yMin;
+        maxX = maxX > gpxFile.statistics.xMax ? maxX : gpxFile.statistics.xMax;
+        maxY = maxY > gpxFile.statistics.yMax ? maxY : gpxFile.statistics.yMax;
+      });
+    } else {
+      minX = 0;
+      minY = 0;
+      maxX = 0;
+      maxY = 0;
+    }
+    origin.setX((maxX - minX) / 2);
+    origin.setY((maxY - minY) / 2);
+    origin.setZ(0);
+    return origin;
   }
 }
