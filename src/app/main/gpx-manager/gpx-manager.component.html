@@ -1,25 +1,20 @@
 <div>
   <h1>
-    <i
-      class="i-button eva eva-move"
-      (click)="move()"
-      title="Move this panel"
-    ></i>
-    Gpx files
+    {{ 'GPX_MANAGER.TITLE' | translate }}
     <i
       class="right i-button eva eva-plus"
       (click)="displayAdd = !displayAdd"
-      title="Add"
+      title="{{ 'GPX_MANAGER.ADD' | translate }}"
     ></i>
   </h1>
   <p *ngFor="let gpxFile of model?.gpxFiles">
     <i
-      title="Delete"
+      title="{{ 'GPX_MANAGER.DELETE' | translate }}"
       (click)="delete(gpxFile.id)"
       class="i-button eva eva-trash"
     ></i
     ><i
-      title="See"
+      title="{{ 'GPX_MANAGER.SHOW_HIDE' | translate }}"
       (click)="see(gpxFile.id)"
       class="i-button eva"
       [ngClass]="{

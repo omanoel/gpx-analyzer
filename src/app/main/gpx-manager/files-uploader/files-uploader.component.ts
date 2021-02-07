@@ -12,6 +12,7 @@ import * as XmlParser from 'fast-xml-parser';
 import * as proj4x from 'proj4';
 import { TrackPoint, TrackStatistics } from '../../track/track.model';
 import { COLORS } from '../../colors.constant';
+import { TranslateService } from '@ngx-translate/core';
 const proj4 = (proj4x as any).default;
 
 @Component({
@@ -26,6 +27,7 @@ export class FilesUploaderComponent {
   files: any[] = [];
 
   constructor(
+    public translate: TranslateService,
     private _gpxFileDbService: GpxFileDbService,
     private _changeDetectorRef: ChangeDetectorRef
   ) {}
