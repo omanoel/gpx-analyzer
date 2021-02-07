@@ -5,6 +5,7 @@ import {
   Input,
   OnInit
 } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { GpxFileDbService } from '../dexie-db/gpx-file-db.service';
 import { GpxFile } from '../dexie-db/gpx-file.model';
 import { MainComponentModel } from '../main.component.model';
@@ -22,6 +23,7 @@ export class GpxManagerComponent implements OnInit {
   public displayAdd = false;
   //
   constructor(
+    public translate: TranslateService,
     private _gpxFileDbService: GpxFileDbService,
     private _sceneService: SceneService,
     private _changeDetectorRef: ChangeDetectorRef
