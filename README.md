@@ -1,5 +1,9 @@
 # Gpx Analyzer
 
+## Demo
+
+[http://manoloexpo.free.fr/__experimentations/gpx-analyzer/index.html]
+
 ## Functional description
 
 ### Done
@@ -7,6 +11,7 @@
 - Add / delete GPX file(s)
 - Display 3D GPX track
 - Show / hide 3D track
+- Display with top view
 
 ### Todo
 
