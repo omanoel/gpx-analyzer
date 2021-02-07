@@ -64,8 +64,27 @@
   },
   "GPX_MANAGER": {
     "ADD": "Add a GPX track",
+    "COMPARE_ACTIVITY": "Compare this track",
     "DELETE": "Delete this GPX track",
     "SHOW_HIDE": "Show/hide this GPX track",
+    "SHOW_STATS": "Show statistics for this GPX track",
     "TITLE": "GPX tracks"
+  },
+  "GPX_STATISTICS": {
+    "CLOSE": "Close",
+    "PROP_LABELS": {
+      "ALTITUDE_MIN": "Minimum altitude",
+      "ALTITUDE_MAX": "Maximum altitude",
+      "DELAY_MOVE": "Travel time",
+      "DELAY_TOTAL": "Total time",
+      "LENGTH": "Lengh",
+      "NAME": "Name",
+      "NEGATIVE_ELEVATION": "Negative elevation",
+      "POSITIVE_ELEVATION": "Positive elevation",
+      "SPEED_MAX": "Maximum speed",
+      "SPEED_MOVE": "Travel speed",
+      "SPEED_TOTAL": "Total speed"
+    },
+    "TITLE": "Statistics"
   }
 }

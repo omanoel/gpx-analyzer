@@ -1,0 +1,54 @@
+<section>
+  <h1>
+    {{ 'GPX_STATISTICS.TITLE' | translate
+    }}<i
+      class="right i-button eva eva-close-outline"
+      (click)="close()"
+      title="{{ 'GPX_STATISTICS.CLOSE' | translate }}"
+    ></i>
+  </h1>
+  <p [style.color]="getRgbColor(item)">
+    {{ 'GPX_STATISTICS.PROP_LABELS.NAME' | translate }}:
+    {{ item.statistics.title }}
+  </p>
+  <p>
+    {{ 'GPX_STATISTICS.PROP_LABELS.LENGTH' | translate }}:
+    {{ item.statistics.distance }} km
+  </p>
+  <p>
+    {{ 'GPX_STATISTICS.PROP_LABELS.DELAY_TOTAL' | translate }}:
+    {{ formatDelay(item.statistics.delayTotal) }}
+  </p>
+  <p>
+    {{ 'GPX_STATISTICS.PROP_LABELS.DELAY_MOVE' | translate }}:
+    {{ formatDelay(item.statistics.delayMove) }}
+  </p>
+  <p>
+    {{ 'GPX_STATISTICS.PROP_LABELS.SPEED_TOTAL' | translate }}:
+    {{ item.statistics.speedTotal }} km/h
+  </p>
+  <p>
+    {{ 'GPX_STATISTICS.PROP_LABELS.SPEED_MOVE' | translate }}:
+    {{ item.statistics.speedMove }} km/h
+  </p>
+  <p>
+    {{ 'GPX_STATISTICS.PROP_LABELS.SPEED_MAX' | translate }}:
+    {{ item.statistics.speedMax }} km/h
+  </p>
+  <p>
+    {{ 'GPX_STATISTICS.PROP_LABELS.ALTITUDE_MIN' | translate }}:
+    {{ item.statistics.altitudeMin }} m
+  </p>
+  <p>
+    {{ 'GPX_STATISTICS.PROP_LABELS.ALTITUDE_MAX' | translate }}:
+    {{ item.statistics.altitudeMax }} m
+  </p>
+  <p>
+    {{ 'GPX_STATISTICS.PROP_LABELS.POSITIVE_ELEVATION' | translate }}:
+    {{ item.statistics.ascendingElevation }} m
+  </p>
+  <p>
+    {{ 'GPX_STATISTICS.PROP_LABELS.NEGATIVE_ELEVATION' | translate }}:
+    {{ item.statistics.descendingElevation }} m
+  </p>
+</section>
