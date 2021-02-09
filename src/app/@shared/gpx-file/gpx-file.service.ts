@@ -13,9 +13,16 @@ export class GpxFileService {
     //
   }
 
-  public buildGpxFile(file: any, jsonData: any): GpxFile {
+  public buildGpxFile(
+    file: any,
+    jsonData: any,
+    interpolationStep: number
+  ): GpxFile {
     const statistics = this._buildStatistics(jsonData);
-    const interpolated = this._buildInterpolatedStatistics(statistics);
+    const interpolated = this._buildInterpolatedStatistics(
+      statistics,
+      interpolationStep
+    );
     return {
       title: file.name,
       data: jsonData,
@@ -34,43 +41,82 @@ export class GpxFileService {
     if (track.trkseg?.trkpt == null) {
       return stats;
     }
-    let length = 0;
     const trkPt: any[] = track.trkseg.trkpt;
-    const lon0 = +trkPt[0]['@']['@_lon'];
-    const lat0 = +trkPt[0]['@']['@_lat'];
-    const z0 = +trkPt[0]['ele'];
-    const datetime0 = new Date(trkPt[0]['time']).getTime();
-    const xy0 = this._transformLonLatInEN(lon0, lat0);
-    const xyzPrevious = [xy0[0], xy0[1], z0];
-    let datetimePrevious = datetime0;
-    let index = 0;
-    trkPt.forEach((s: any) => {
-      const trackPoint: TrackPoint = {
-        lon: null,
-        lat: null,
-        altitude: null,
-        x: null,
-        y: null,
-        datetime: null,
-        speed: null,
-        deltaX: null,
-        deltaY: null,
-        deltaZ: null,
-        deltaDistance: null,
-        deltaDatetime: null,
-        deltaX0: null,
-        deltaY0: null,
-        deltaZ0: null,
-        deltaDistance0: null,
-        deltaDatetime0: null,
-        temperature: null,
-        windSpeed: null,
-        windDirection: null
-      };
+    stats.trkPoints = trkPt.map((s: any) => {
+      const trackPoint = this._initTrackPoint();
       trackPoint.lon = +s['@']['@_lon'];
       trackPoint.lat = +s['@']['@_lat'];
       trackPoint.altitude = +s['ele'];
       trackPoint.datetime = new Date(s['time']).getTime();
+      return trackPoint;
+    });
+    this._computeStatistics(stats);
+    return stats;
+  }
+
+  private _initStatistics(title: string): TrackStatistics {
+    return {
+      title: title,
+      distance: 0,
+      delayMove: 0,
+      delayTotal: 0,
+      speedMove: 0,
+      speedTotal: 0,
+      speedMax: Number.NEGATIVE_INFINITY,
+      altitudeMin: Number.POSITIVE_INFINITY,
+      altitudeMax: Number.NEGATIVE_INFINITY,
+      ascendingElevation: 0,
+      descendingElevation: 0,
+      lonMin: Number.POSITIVE_INFINITY,
+      lonMax: Number.NEGATIVE_INFINITY,
+      latMin: Number.POSITIVE_INFINITY,
+      latMax: Number.NEGATIVE_INFINITY,
+      xMin: Number.POSITIVE_INFINITY,
+      xMax: Number.NEGATIVE_INFINITY,
+      yMin: Number.POSITIVE_INFINITY,
+      yMax: Number.NEGATIVE_INFINITY,
+      points: 0,
+      trkPoints: [],
+      colors: []
+    };
+  }
+
+  private _initTrackPoint(): TrackPoint {
+    return {
+      lon: null,
+      lat: null,
+      altitude: null,
+      x: null,
+      y: null,
+      datetime: null,
+      speed: null,
+      deltaX: null,
+      deltaY: null,
+      deltaZ: null,
+      deltaDistance: null,
+      deltaDatetime: null,
+      deltaX0: null,
+      deltaY0: null,
+      deltaZ0: null,
+      deltaDistance0: null,
+      deltaDatetime0: null,
+      temperature: null,
+      windSpeed: null,
+      windDirection: null
+    };
+  }
+
+  private _computeStatistics(stats: TrackStatistics): void {
+    let length = 0;
+    const lon0 = stats.trkPoints[0].lon;
+    const lat0 = stats.trkPoints[0].lat;
+    const z0 = stats.trkPoints[0].altitude;
+    const datetime0 = stats.trkPoints[0].datetime;
+    const xy0 = this._transformLonLatInEN(lon0, lat0);
+    const xyzPrevious = [xy0[0], xy0[1], z0];
+    let datetimePrevious = datetime0;
+    let index = 0;
+    stats.trkPoints.forEach((trackPoint: TrackPoint) => {
       trackPoint.deltaDatetime0 = trackPoint.datetime - datetime0;
       trackPoint.deltaDatetime = trackPoint.datetime - datetimePrevious;
       const xy = this._transformLonLatInEN(trackPoint.lon, trackPoint.lat);
@@ -128,35 +174,6 @@ export class GpxFileService {
       Math.round(stats.descendingElevation * 100) / 100;
     stats.ascendingElevation = Math.round(stats.ascendingElevation * 100) / 100;
     stats.points = stats.trkPoints.length;
-
-    return stats;
-  }
-
-  private _initStatistics(title: string): TrackStatistics {
-    return {
-      title: title,
-      distance: 0,
-      delayMove: 0,
-      delayTotal: 0,
-      speedMove: 0,
-      speedTotal: 0,
-      speedMax: Number.NEGATIVE_INFINITY,
-      altitudeMin: Number.POSITIVE_INFINITY,
-      altitudeMax: Number.NEGATIVE_INFINITY,
-      ascendingElevation: 0,
-      descendingElevation: 0,
-      lonMin: Number.POSITIVE_INFINITY,
-      lonMax: Number.NEGATIVE_INFINITY,
-      latMin: Number.POSITIVE_INFINITY,
-      latMax: Number.NEGATIVE_INFINITY,
-      xMin: Number.POSITIVE_INFINITY,
-      xMax: Number.NEGATIVE_INFINITY,
-      yMin: Number.POSITIVE_INFINITY,
-      yMax: Number.NEGATIVE_INFINITY,
-      points: 0,
-      trkPoints: [],
-      colors: []
-    };
   }
 
   private _transformLonLatInEN(lon: number, lat: number): number[] {
@@ -220,24 +237,75 @@ export class GpxFileService {
   }
 
   private _buildInterpolatedStatistics(
-    statistics: TrackStatistics
+    statistics: TrackStatistics,
+    interpolationStep: number
   ): TrackStatistics {
-    const interpolated = this._initStatistics(statistics.title);
-    /*
-    const trackPts: TrackPoint[] = [].concat(...statistics.trkPoints);
+    const interpolatedStats = this._initStatistics(statistics.title);
     let maxDistance = 0;
-    let indexPrevious = 0;
-    let indexNext = 0;
-    interpolated.trkPoints.push(trackPts[indexPrevious]);
-    while (maxDistance < statistics.distance) {
-      maxDistance += 0.02;
-      for (let z = indexPrevious + 1; z < trackPts.length; z++) {
-        if (trackPts[z].deltaDistance0 <= maxDistance) {
-        }
+    interpolatedStats.trkPoints.push(statistics.trkPoints[0]);
+    maxDistance += interpolationStep;
+    for (let z = 1; z < statistics.trkPoints.length; z++) {
+      while (statistics.trkPoints[z].deltaDistance0 > maxDistance) {
+        interpolatedStats.trkPoints.push(
+          this._buildInterpolatedTrackPoint(
+            statistics.trkPoints[z - 1],
+            statistics.trkPoints[z],
+            maxDistance
+          )
+        );
+        maxDistance += interpolationStep;
       }
-      maxDistance += 0.02;
     }
-    */
-    return interpolated;
+    this._computeStatistics(interpolatedStats);
+    return interpolatedStats;
+  }
+
+  private _buildInterpolatedTrackPoint(
+    previous: TrackPoint,
+    next: TrackPoint,
+    distance: number
+  ): TrackPoint {
+    let ratio = 0;
+    if (next.deltaDistance0 !== previous.deltaDistance0) {
+      ratio =
+        (distance - previous.deltaDistance0) /
+        (next.deltaDistance0 - previous.deltaDistance0);
+    }
+    const interpolatedPoint = this._initTrackPoint();
+    interpolatedPoint.lon = this._interpolateValue(
+      previous.lon,
+      next.lon,
+      ratio
+    );
+    interpolatedPoint.lat = this._interpolateValue(
+      previous.lat,
+      next.lat,
+      ratio
+    );
+    interpolatedPoint.altitude = this._interpolateValue(
+      previous.altitude,
+      next.altitude,
+      ratio
+    );
+    interpolatedPoint.datetime = this._interpolateValue(
+      previous.datetime,
+      next.datetime,
+      ratio
+    );
+    return interpolatedPoint;
+  }
+
+  private _interpolateValue(
+    previous: number,
+    next: number,
+    ratio: number
+  ): number {
+    if (previous === null || next === null) {
+      return null;
+    }
+    if (next === previous) {
+      return previous;
+    }
+    return previous + ratio * (next - previous);
   }
 }

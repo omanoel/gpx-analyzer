@@ -38,7 +38,9 @@ export interface MainComponentModel {
   target: TargetModel;
   countObjects: number;
   zScale: number;
+  interpolationStepFc: number;
   needsUpdate: boolean;
+  needsRemove: boolean;
   gpxFiles: GpxFile[];
   firstPosition: THREE.Vector3;
   menu: MenuModel;

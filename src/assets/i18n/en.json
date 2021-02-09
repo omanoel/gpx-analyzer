@@ -12,6 +12,7 @@
     "EXPAND": "Expand this panel"
   },
   "TOOLS": {
+    "INTERPOLATION_STEP": "Interpolation step (in m)",
     "Z_SCALE": "Scale factor along z axis"
   },
   "CATALOGS": {

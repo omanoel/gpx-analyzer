@@ -5,12 +5,14 @@ import {
   Output,
   EventEmitter,
   ChangeDetectionStrategy,
-  ChangeDetectorRef
+  ChangeDetectorRef,
+  Input
 } from '@angular/core';
 import { GpxFileDbService } from '../../@shared/gpx-file/gpx-file-db.service';
 import * as XmlParser from 'fast-xml-parser';
 import { TranslateService } from '@ngx-translate/core';
 import { GpxFileService } from 'src/app/@shared/gpx-file/gpx-file.service';
+import { MainComponentModel } from 'src/app/@main/main.component.model';
 
 @Component({
   selector: 'app-files-uploader',
@@ -19,6 +21,8 @@ import { GpxFileService } from 'src/app/@shared/gpx-file/gpx-file.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FilesUploaderComponent {
+  @Input()
+  public model: MainComponentModel;
   @Output() onAdd: EventEmitter<void> = new EventEmitter();
   @ViewChild('fileDropRef', { static: false }) fileDropEl: ElementRef;
   files: any[] = [];
@@ -78,7 +82,13 @@ export class FilesUploaderComponent {
     reader.onloadend = () => {
       const xmlToJson = this._transformXmlToJson(reader.result);
       this._gpxFileDbService
-        .add(this._gpxFileService.buildGpxFile(this.files[index], xmlToJson))
+        .add(
+          this._gpxFileService.buildGpxFile(
+            this.files[index],
+            xmlToJson,
+            this.model.interpolationStepFc
+          )
+        )
         .then((id) => {
           index++;
           if (index < this.files.length) {

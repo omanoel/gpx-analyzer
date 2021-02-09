@@ -12,6 +12,7 @@
     "EXPAND": "Agrandrir ce panneau"
   },
   "TOOLS": {
+    "INTERPOLATION_STEP": "Intervalle d'interpolation (in m)",
     "Z_SCALE": "Facteur d'échelle selon l'axe vertical (altitude)"
   },
   "CATALOGS": {

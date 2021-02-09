@@ -7,7 +7,7 @@ import { SceneService } from '../scene/scene.service';
 @Injectable({
   providedIn: 'root'
 })
-export class TrackService {
+export class Track3dService {
   constructor(private _sceneService: SceneService) {
     // Empty
   }
@@ -33,11 +33,17 @@ export class TrackService {
       }
     }
 
-    this._removeTracks(mainComponentModel);
-    this._addTracks(mainComponentModel, mainComponentModel.firstPosition);
+    this._remove3dTracks(mainComponentModel);
+    this._add3dTracks(mainComponentModel, mainComponentModel.firstPosition);
   }
 
-  private _addTracks(
+  public removeAll(mainComponentModel: MainComponentModel): void {
+    mainComponentModel.scene.remove(
+      ...this._sceneService.getTack3ds(mainComponentModel.scene)
+    );
+  }
+
+  private _add3dTracks(
     mainComponentModel: MainComponentModel,
     origin: THREE.Vector3
   ): void {
@@ -52,7 +58,16 @@ export class TrackService {
           this._build3dTrack(
             gpxFile.statistics,
             mainComponentModel.zScale,
-            origin
+            origin,
+            false
+          )
+        );
+        obj3dsToAdd.push(
+          this._build3dTrack(
+            gpxFile.interpolated,
+            mainComponentModel.zScale,
+            origin,
+            true
           )
         );
       }
@@ -62,7 +77,7 @@ export class TrackService {
     }
   }
 
-  private _removeTracks(mainComponentModel: MainComponentModel): void {
+  private _remove3dTracks(mainComponentModel: MainComponentModel): void {
     const obj3dsToRemove: THREE.Object3D[] = [];
     this._sceneService.getTack3ds(mainComponentModel.scene).forEach((obj3d) => {
       if (
@@ -81,20 +96,22 @@ export class TrackService {
   private _build3dTrack(
     gpxStatistics: TrackStatistics,
     zScale: number,
-    origin: THREE.Vector3
+    origin: THREE.Vector3,
+    interpolated: boolean
   ): THREE.Object3D {
     const track = new THREE.Object3D();
     track.name = gpxStatistics.title;
     const track3dChildren = new THREE.Object3D();
     const colors: number[] = gpxStatistics.colors;
+    const i = interpolated ? 0.1 : 0;
     const r = colors[0] / 255;
-    const g = colors[1] / 255;
+    const g = colors[1] / 255 + i;
     const b = colors[2] / 255;
 
     const materialTrackSeg = new THREE.LineBasicMaterial({
       color: new THREE.Color(r, g, b),
       transparent: true,
-      opacity: 1
+      opacity: interpolated ? 0.5 : 1
     });
     const meshes: THREE.Mesh[] = [];
     const points: THREE.Vector3[] = [];
@@ -110,7 +127,7 @@ export class TrackService {
           deltaZOrigin + tkpt.deltaZ0 * zScale
         )
       );
-      const geometry = new THREE.BoxGeometry(1, 1, 1);
+      const geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
       geometry.translate(
         deltaXOrigin + tkpt.deltaX0,
         deltaYOrigin + tkpt.deltaY0,
