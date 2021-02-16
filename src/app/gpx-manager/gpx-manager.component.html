@@ -29,7 +29,7 @@
     ></i
     ><i
       title="{{ 'GPX_MANAGER.COMPARE_ACTIVITY' | translate }}"
-      (click)="compareActivity(gpxFile.id)"
+      (click)="showCharts(gpxFile.id)"
       class="i-button eva eva-activity-outline"
     ></i
     ><span [style.color]="getRgbColor(gpxFile)">{{ gpxFile.title }}</span>
@@ -45,3 +45,9 @@
   [item]="selectedItem"
   (onClose)="closeStats()"
 ></app-gpx-statistics>
+<app-charts
+  *ngIf="displayCharts"
+  [model]="model"
+  [item]="selectedItemForChart"
+  (onClose)="closeCharts()"
+></app-charts>

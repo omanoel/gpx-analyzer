@@ -50,7 +50,7 @@ export class GpxFileService {
       trackPoint.datetime = new Date(s['time']).getTime();
       return trackPoint;
     });
-    this._computeStatistics(stats);
+    this._computeStatistics(stats, false);
     return stats;
   }
 
@@ -106,7 +106,10 @@ export class GpxFileService {
     };
   }
 
-  private _computeStatistics(stats: TrackStatistics): void {
+  private _computeStatistics(
+    stats: TrackStatistics,
+    interpolated: boolean
+  ): void {
     let length = 0;
     const lon0 = stats.trkPoints[0].lon;
     const lat0 = stats.trkPoints[0].lat;
@@ -130,9 +133,11 @@ export class GpxFileService {
       trackPoint.deltaZ = trackPoint.altitude - xyzPrevious[2];
       const deltaXDistance = trackPoint.x - xyzPrevious[0];
       const deltaYDistance = trackPoint.y - xyzPrevious[1];
-      trackPoint.deltaDistance = Math.sqrt(
-        deltaXDistance * deltaXDistance + deltaYDistance * deltaYDistance
-      );
+      if (!interpolated) {
+        trackPoint.deltaDistance = Math.sqrt(
+          deltaXDistance * deltaXDistance + deltaYDistance * deltaYDistance
+        );
+      }
       trackPoint.speed = this._getDistanceInKm(
         this._getSpeedInKmPerHour(
           trackPoint.deltaDistance,
@@ -140,13 +145,14 @@ export class GpxFileService {
         )
       );
       length += trackPoint.deltaDistance;
-      trackPoint.deltaDistance0 = length;
+      if (!interpolated) {
+        trackPoint.deltaDistance0 = length;
+      }
       xyzPrevious[0] = trackPoint.x;
       xyzPrevious[1] = trackPoint.y;
       xyzPrevious[2] = trackPoint.altitude;
       datetimePrevious = trackPoint.datetime;
       length = trackPoint.deltaDistance0;
-      stats.trkPoints.push(trackPoint);
       this._setBoundaries(stats, trackPoint);
       stats.colors = COLORS.get(index);
       index++;
@@ -205,7 +211,7 @@ export class GpxFileService {
     if (distance > 0) {
       return Math.floor(((distance * 3600000) / time) * 100) / 100;
     }
-    return NaN;
+    return 0;
   }
 
   private _setBoundaries(stats: TrackStatistics, trackPoint: TrackPoint): void {
@@ -250,20 +256,22 @@ export class GpxFileService {
           this._buildInterpolatedTrackPoint(
             statistics.trkPoints[z - 1],
             statistics.trkPoints[z],
-            maxDistance
+            maxDistance,
+            interpolationStep
           )
         );
         maxDistance += interpolationStep;
       }
     }
-    this._computeStatistics(interpolatedStats);
+    this._computeStatistics(interpolatedStats, true);
     return interpolatedStats;
   }
 
   private _buildInterpolatedTrackPoint(
     previous: TrackPoint,
     next: TrackPoint,
-    distance: number
+    distance: number,
+    stepDistance: number
   ): TrackPoint {
     let ratio = 0;
     if (next.deltaDistance0 !== previous.deltaDistance0) {
@@ -292,6 +300,8 @@ export class GpxFileService {
       next.datetime,
       ratio
     );
+    interpolatedPoint.deltaDistance0 = distance;
+    interpolatedPoint.deltaDistance = stepDistance;
     return interpolatedPoint;
   }
 

@@ -12,9 +12,18 @@ import { MainComponent } from './main.component';
 import { MapComponent } from '../map/map.component';
 import { MenuComponent } from '../menu/menu.component';
 import { ToolsComponent } from '../tools/tools.component';
+import { NgxEchartsModule } from 'ngx-echarts';
+import { ChartsComponent } from '../charts/charts.component';
 
 @NgModule({
-  imports: [CommonModule, ReactiveFormsModule, TranslateModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    TranslateModule,
+    NgxEchartsModule.forRoot({
+      echarts: () => import('echarts')
+    })
+  ],
   declarations: [
     DndDirective,
     MainComponent,
@@ -25,7 +34,8 @@ import { ToolsComponent } from '../tools/tools.component';
     GpxStatisticsComponent,
     FilesUploaderComponent,
     ProgressComponent,
-    MenuComponent
+    MenuComponent,
+    ChartsComponent
   ],
   exports: [MainComponent]
 })
