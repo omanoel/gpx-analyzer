@@ -29,15 +29,25 @@
     ></i
     ><i
       title="{{ 'GPX_MANAGER.COMPARE_ACTIVITY' | translate }}"
-      (click)="compareActivity(gpxFile.id)"
+      (click)="showCharts(gpxFile.id)"
       class="i-button eva eva-activity-outline"
     ></i
     ><span [style.color]="getRgbColor(gpxFile)">{{ gpxFile.title }}</span>
   </p>
 </div>
-<app-files-uploader *ngIf="displayAdd" (onAdd)="refresh()"></app-files-uploader>
+<app-files-uploader
+  *ngIf="displayAdd"
+  [model]="model"
+  (onAdd)="refresh()"
+></app-files-uploader>
 <app-gpx-statistics
   *ngIf="selectedItem"
   [item]="selectedItem"
   (onClose)="closeStats()"
 ></app-gpx-statistics>
+<app-charts
+  *ngIf="displayCharts"
+  [model]="model"
+  [item]="selectedItemForChart"
+  (onClose)="closeCharts()"
+></app-charts>

@@ -9,7 +9,7 @@ import { TrackballControlsService } from '../@shared/trackball-controls/trackbal
 import { MainComponentModel } from './main.component.model';
 import { ReferentielService } from '../@shared/referentiel/referentiel.service';
 import { TargetService } from '../@shared/target/target.service';
-import { TrackService } from '../@shared/track/track.service';
+import { Track3dService } from '../@shared/track/track3d.service';
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +23,7 @@ export class MainComponentService {
     private _sceneService: SceneService,
     private _referentielService: ReferentielService,
     private _targetService: TargetService,
-    private _trackService: TrackService
+    private _track3dService: Track3dService
   ) {}
 
   public initModel(element: ElementRef): MainComponentModel {
@@ -59,7 +59,9 @@ export class MainComponentService {
       target: null,
       countObjects: 0,
       zScale: 1,
+      interpolationStepFc: 10,
       needsUpdate: false,
+      needsRemove: false,
       gpxFiles: [],
       firstPosition: null,
       menu: {
@@ -199,11 +201,15 @@ export class MainComponentService {
       mainComponentModel.camera
     );
     //
+    if (mainComponentModel.needsRemove) {
+      this._track3dService.removeAll(mainComponentModel);
+      mainComponentModel.needsRemove = false;
+    }
     if (mainComponentModel.needsUpdate) {
       // console.log('firstPosition', mainComponentModel.firstPosition);
       // console.log('camera.position', mainComponentModel.camera.position);
       // console.log('camera.up', mainComponentModel.camera.up);
-      this._trackService.build3dTracks(mainComponentModel);
+      this._track3dService.build3dTracks(mainComponentModel);
       mainComponentModel.countObjects = this._sceneService.getTack3ds(
         mainComponentModel.scene
       ).length;

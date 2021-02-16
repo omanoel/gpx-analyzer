@@ -19,13 +19,22 @@ export class ToolsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.toolsForm = new FormGroup({
-      zScaleFc: new FormControl(1, Validators.required)
+      zScaleFc: new FormControl(1, Validators.required),
+      interpolationStepFc: new FormControl(10, Validators.required)
     });
     // subscriptions
     this.toolsForm.get('zScaleFc').valueChanges.subscribe((value: number) => {
       this.model.zScale = value;
       this.model.needsUpdate = true;
+      this.model.needsRemove = true;
     });
+    this.toolsForm
+      .get('interpolationStepFc')
+      .valueChanges.subscribe((value: number) => {
+        this.model.interpolationStepFc = value;
+        this.model.needsUpdate = true;
+        this.model.needsRemove = true;
+      });
   }
 
   ngOnDestroy(): void {

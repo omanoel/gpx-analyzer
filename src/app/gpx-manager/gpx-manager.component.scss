@@ -1,11 +1,11 @@
 :host {
-  position: absolute;
-  top: 5px;
-  left: 40px;
-  border: 1px solid grey;
-  min-width: 200px;
-
   .manager {
+    position: absolute;
+    top: 5px;
+    left: 40px;
+    border: 1px solid grey;
+    min-width: 200px;
+
     h1 {
       font-size: 11px;
       margin: 0;

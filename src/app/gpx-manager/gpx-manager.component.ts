@@ -22,6 +22,8 @@ export class GpxManagerComponent implements OnInit {
   public model: MainComponentModel;
   public displayAdd = false;
   public selectedItem: GpxFile = null;
+  public selectedItemForChart: GpxFile = null;
+  public displayCharts = false;
   //
   constructor(
     public translate: TranslateService,
@@ -62,14 +64,15 @@ export class GpxManagerComponent implements OnInit {
   see(id: number): void {
     const found = this.model.gpxFiles.find((gpxFile) => gpxFile.id === id);
     if (found) {
-      const tk3d = this._sceneService
+      const tk3ds = this._sceneService
         .getTack3ds(this.model.scene)
-        .find((obj) => obj.name === found.statistics.title);
-      if (tk3d) {
+        .filter((obj) => obj.name === found.statistics.title);
+      tk3ds.forEach((tk3d) => {
         tk3d.visible = !tk3d.visible;
-        this.model.needsUpdate = true;
-        this._changeDetectorRef.detectChanges();
-      }
+      });
+
+      this.model.needsUpdate = true;
+      this._changeDetectorRef.detectChanges();
     }
   }
 
@@ -105,7 +108,17 @@ export class GpxManagerComponent implements OnInit {
     this._changeDetectorRef.detectChanges();
   }
 
-  compareActivity(id: number): void {
-    //
+  showCharts(id: number): void {
+    this.selectedItemForChart = this.model.gpxFiles.find(
+      (gpxFile) => gpxFile.id === id
+    );
+    this.displayCharts = true;
+    this._changeDetectorRef.detectChanges();
+  }
+
+  closeCharts(): void {
+    this.displayCharts = false;
+    this.selectedItemForChart = null;
+    this._changeDetectorRef.detectChanges();
   }
 }
