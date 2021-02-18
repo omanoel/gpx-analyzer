@@ -1,11 +1,8 @@
 :host {
-  position: absolute;
-  top: 100px;
-  left: 15%;
-  border: 1px solid grey;
-  width: 70%;
-
   section {
+    position: absolute;
+    border: 1px solid grey;
+    width: 70%;
     background-color: rgba($color: #000000, $alpha: 0.7);
   }
 
@@ -31,5 +28,11 @@
     padding: 5px;
     margin: 2px;
     background-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .form {
+    position: absolute;
+    left: 10px;
+    top: 35px;
   }
 }
