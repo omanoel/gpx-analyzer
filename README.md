@@ -12,12 +12,14 @@
 - Display 3D GPX track
 - Show / hide 3D track
 - Display with top view
+- Show track statistics
+- Display 2D charts (speed vs distance)
+- Change axis on 2D charts
+- Change type of 2D Charts (line / scatter)
 
 ### Todo
 
-- Show track statistics
 - Compare tracks
-- Display 2D charts
 
 ## Technical description
 

@@ -1,4 +1,4 @@
-<section>
+<section draggable="true" [ngStyle]="{ 'top.px': top, 'left.px': left }">
   <h1>
     {{ 'GPX_STATISTICS.TITLE' | translate
     }}<i
@@ -8,4 +8,26 @@
     ></i>
   </h1>
   <div echarts [options]="options" class="demo-chart"></div>
+  <div class="form">
+    <form [formGroup]="axisForm" title="X axis">
+      <select [formControl]="xAxisFc">
+        <option *ngFor="let axisOption of axisOptions" [ngValue]="axisOption">
+          {{ axisOption }}
+        </option>
+      </select>
+      <select [formControl]="yAxisFc" title="Y axis">
+        <option *ngFor="let axisOption of axisOptions" [ngValue]="axisOption">
+          {{ axisOption }}
+        </option>
+      </select>
+      <select [formControl]="chartTypeFc" title="Chart type">
+        <option
+          *ngFor="let chartTypeOption of chartTypeOptions"
+          [ngValue]="chartTypeOption"
+        >
+          {{ chartTypeOption }}
+        </option>
+      </select>
+    </form>
+  </div>
 </section>

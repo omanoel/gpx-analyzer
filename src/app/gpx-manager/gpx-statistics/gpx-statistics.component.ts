@@ -4,7 +4,8 @@ import {
   OnInit,
   Input,
   Output,
-  EventEmitter
+  EventEmitter,
+  HostListener
 } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { GpxFile } from '../../@shared/gpx-file/gpx-file.model';
@@ -21,6 +22,25 @@ export class GpxStatisticsComponent implements OnInit {
 
   @Output()
   public onClose: EventEmitter<void> = new EventEmitter();
+
+  public top = 100;
+  public left = 100;
+
+  private _clientX = 0;
+  private _clientY = 0;
+
+  @HostListener('dragstart', ['$event'])
+  onDragStart(event: DragEvent): void {
+    this._clientX = event.clientX;
+    this._clientY = event.clientY;
+  }
+
+  @HostListener('dragend', ['$event'])
+  onDragEnd(event: DragEvent): void {
+    event.preventDefault();
+    this.left += event.clientX - this._clientX;
+    this.top += event.clientY - this._clientY;
+  }
 
   constructor(public translate: TranslateService) {
     // Empty
