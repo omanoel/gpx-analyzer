@@ -23,7 +23,9 @@ export class GpxManagerComponent implements OnInit {
   public displayAdd = false;
   public selectedItem: GpxFile = null;
   public selectedItemForChart: GpxFile = null;
+  public selectedItemForTable: GpxFile = null;
   public displayCharts = false;
+  public displayTable = false;
   //
   constructor(
     public translate: TranslateService,
@@ -119,6 +121,20 @@ export class GpxManagerComponent implements OnInit {
   closeCharts(): void {
     this.displayCharts = false;
     this.selectedItemForChart = null;
+    this._changeDetectorRef.detectChanges();
+  }
+
+  showTable(id: number): void {
+    this.selectedItemForTable = this.model.gpxFiles.find(
+      (gpxFile) => gpxFile.id === id
+    );
+    this.displayTable = true;
+    this._changeDetectorRef.detectChanges();
+  }
+
+  closeTable(): void {
+    this.displayTable = false;
+    this.selectedItemForTable = null;
     this._changeDetectorRef.detectChanges();
   }
 }

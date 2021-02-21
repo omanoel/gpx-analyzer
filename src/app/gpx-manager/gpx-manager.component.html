@@ -28,6 +28,11 @@
       class="i-button eva eva-bar-chart-outline"
     ></i
     ><i
+      title="{{ 'GPX_MANAGER.SHOW_STATS' | translate }}"
+      (click)="showTable(gpxFile.id)"
+      class="i-button eva eva-grid-outline"
+    ></i
+    ><i
       title="{{ 'GPX_MANAGER.COMPARE_ACTIVITY' | translate }}"
       (click)="showCharts(gpxFile.id)"
       class="i-button eva eva-activity-outline"
@@ -51,3 +56,9 @@
   [item]="selectedItemForChart"
   (onClose)="closeCharts()"
 ></app-charts>
+<app-table
+  *ngIf="displayTable"
+  [model]="model"
+  [item]="selectedItemForTable"
+  (onClose)="closeTable()"
+></app-table>

@@ -14,6 +14,7 @@ import { MenuComponent } from '../menu/menu.component';
 import { ToolsComponent } from '../tools/tools.component';
 import { NgxEchartsModule } from 'ngx-echarts';
 import { ChartsComponent } from '../charts/charts.component';
+import { TableComponent } from '../table/table.component';
 
 @NgModule({
   imports: [
@@ -35,7 +36,8 @@ import { ChartsComponent } from '../charts/charts.component';
     FilesUploaderComponent,
     ProgressComponent,
     MenuComponent,
-    ChartsComponent
+    ChartsComponent,
+    TableComponent
   ],
   exports: [MainComponent]
 })
