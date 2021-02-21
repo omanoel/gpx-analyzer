@@ -29,13 +29,13 @@ export class ChartsComponent implements OnInit {
   @Output()
   public onClose: EventEmitter<void> = new EventEmitter();
 
-  public top = 100;
-  public left = 100;
-
   public axisForm: FormGroup;
   public xAxisFc: FormControl;
   public yAxisFc: FormControl;
   public chartTypeFc: FormControl;
+
+  public top = 100;
+  public left = 100;
 
   private _clientX = 0;
   private _clientY = 0;
@@ -64,6 +64,10 @@ export class ChartsComponent implements OnInit {
     this._initChart('deltaDistance0', 'speed', 'line');
   }
 
+  close(): void {
+    this.onClose.emit();
+  }
+
   private _initForm(): void {
     this.axisForm = new FormGroup({});
     this.xAxisFc = new FormControl('deltaDistance0', [Validators.required]);
@@ -88,32 +92,57 @@ export class ChartsComponent implements OnInit {
     chartType: ChartType
   ): void {
     // Interpolated data
+    this.item.interpolated.trkPoints.sort(
+      (a, b) => a.deltaDistance0 - b.deltaDistance0
+    );
     const interpolatedData: number[][] = this.item.interpolated.trkPoints.map(
-      (trkP) => [trkP[xProperty] as number, trkP[yProperty] as number]
+      (trkP) => {
+        const x = (trkP[xProperty] as number).toFixed(2);
+        const y = (trkP[yProperty] as number).toFixed(2);
+        return [parseFloat(x), parseFloat(y)];
+      }
     );
-    interpolatedData.sort((a, b) => a[0] - b[0]);
     // Original data
-    const originalData: number[][] = this.item.statistics.trkPoints.map(
-      (trkP) => [trkP[xProperty] as number, trkP[yProperty] as number]
+    this.item.statistics.trkPoints.sort(
+      (a, b) => a.deltaDistance0 - b.deltaDistance0
     );
-    originalData.sort((a, b) => a[0] - b[0]);
+    const originalData: number[][] = this.item.statistics.trkPoints.map(
+      (trkP) => {
+        const x = (trkP[xProperty] as number).toFixed(2);
+        const y = (trkP[yProperty] as number).toFixed(2);
+        return [parseFloat(x), parseFloat(y)];
+      }
+    );
 
     this.options = {
       color: ['#5470C6', '#EE6666'],
       tooltip: {
-        trigger: 'item'
+        trigger: 'item',
+        formatter: '{a}: [{c}]'
       },
       legend: {
         data: ['original', 'interpolated']
       },
       dataZoom: [
         {
-          show: true,
-          filterMode: 'none'
+          type: 'slider',
+          filterMode: 'none',
+          xAxisIndex: 0
         },
         {
           type: 'inside',
-          filterMode: 'none'
+          filterMode: 'none',
+          xAxisIndex: 0
+        },
+        {
+          type: 'slider',
+          filterMode: 'none',
+          yAxisIndex: 0
+        },
+        {
+          type: 'inside',
+          filterMode: 'none',
+          yAxisIndex: 0
         }
       ],
       grid: {
@@ -148,9 +177,5 @@ export class ChartsComponent implements OnInit {
         }
       ]
     };
-  }
-
-  close(): void {
-    this.onClose.emit();
   }
 }

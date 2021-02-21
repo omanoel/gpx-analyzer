@@ -1,0 +1,62 @@
+<section [ngStyle]="{ 'top.px': top, 'left.px': left }">
+  <h1 draggable="true">
+    {{ 'GPX_STATISTICS.TITLE' | translate
+    }}<i
+      class="right i-button eva eva-close-outline"
+      (click)="close()"
+      title="{{ 'GPX_STATISTICS.CLOSE' | translate }}"
+    ></i>
+  </h1>
+  <div class="form">
+    <form [formGroup]="axisForm" title="X axis">
+      <select [formControl]="xAxisFc">
+        <option *ngFor="let axisOption of axisOptions" [ngValue]="axisOption">
+          {{ axisOption }}
+        </option>
+      </select>
+      <select [formControl]="yAxisFc" title="Y axis">
+        <option *ngFor="let axisOption of axisOptions" [ngValue]="axisOption">
+          {{ axisOption }}
+        </option>
+      </select>
+    </form>
+  </div>
+  <div class="two-columns">
+    <div class="flex-column">
+      <table>
+        <caption>
+          Data
+        </caption>
+        <thead>
+          <tr>
+            <td>{{ xAxisFc.value }}</td>
+            <td>{{ yAxisFc.value }}</td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of tableOriginalData">
+            <td>{{ row[0] }}</td>
+            <td>{{ row[1] }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <table>
+        <caption>
+          Data
+        </caption>
+        <thead>
+          <tr>
+            <td>{{ xAxisFc.value }}</td>
+            <td>{{ yAxisFc.value }}</td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of tableInterpolatedData">
+            <td>{{ row[0] }}</td>
+            <td>{{ row[1] }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

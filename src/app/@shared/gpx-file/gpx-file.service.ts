@@ -137,13 +137,13 @@ export class GpxFileService {
         trackPoint.deltaDistance = Math.sqrt(
           deltaXDistance * deltaXDistance + deltaYDistance * deltaYDistance
         );
+        trackPoint.speed = this._getDistanceInKm(
+          this._getSpeedInKmPerHour(
+            trackPoint.deltaDistance,
+            trackPoint.deltaDatetime
+          )
+        );
       }
-      trackPoint.speed = this._getDistanceInKm(
-        this._getSpeedInKmPerHour(
-          trackPoint.deltaDistance,
-          trackPoint.deltaDatetime
-        )
-      );
       length += trackPoint.deltaDistance;
       if (!interpolated) {
         trackPoint.deltaDistance0 = length;
@@ -295,11 +295,13 @@ export class GpxFileService {
       next.altitude,
       ratio
     );
-    interpolatedPoint.datetime = this._interpolateValue(
-      previous.datetime,
-      next.datetime,
+    interpolatedPoint.speed = this._interpolateValue(
+      previous.speed,
+      next.speed,
       ratio
     );
+    interpolatedPoint.datetime =
+      previous.datetime + (stepDistance / interpolatedPoint.speed) * 1000;
     interpolatedPoint.deltaDistance0 = distance;
     interpolatedPoint.deltaDistance = stepDistance;
     return interpolatedPoint;

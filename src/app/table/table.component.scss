@@ -1,0 +1,71 @@
+:host {
+  section {
+    position: absolute;
+    border: 1px solid grey;
+    width: 70%;
+    background-color: rgba($color: #000000, $alpha: 0.7);
+  }
+
+  h1 {
+    font-size: 11px;
+    margin: 0;
+    padding: 5px;
+    background-color: rgba($color: #ffffff, $alpha: 0.3);
+
+    .right {
+      float: right;
+    }
+  }
+
+  .i-button {
+    cursor: pointer;
+    padding: 2px;
+    background-color: rgba(255, 255, 255, 0.2);
+    margin-right: 5px;
+  }
+
+  p {
+    padding: 5px;
+    margin: 2px;
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .form {
+    display: block;
+  }
+
+  .two-columns {
+    display: block;
+
+    .flex-column {
+      display: flex;
+      flex-direction: row;
+
+      table {
+        padding: 5px;
+        flex: 1;
+
+        thead {
+          display: block;
+        }
+
+        tbody {
+          display: block;
+          height: 400px;
+          overflow-y: auto;
+        }
+
+        tr {
+          display: flex;
+          flex-direction: row;
+
+          td {
+            flex: 1;
+            border: 1px solid #666666;
+            padding: 2px;
+          }
+        }
+      }
+    }
+  }
+}
