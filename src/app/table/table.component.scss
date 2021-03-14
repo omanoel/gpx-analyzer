@@ -37,9 +37,11 @@
   .two-columns {
     display: block;
 
-    .flex-column {
-      display: flex;
-      flex-direction: row;
+    .column {
+      // display: flex;
+      // flex-direction: row;
+      height: 400px;
+      overflow: auto;
 
       table {
         padding: 5px;

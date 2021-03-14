@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import * as THREE from 'three';
 import { MainComponentModel } from '../../@main/main.component.model';
-import { TrackPoint, TrackStatistics } from '../gpx-file/gpx-file.model';
+import { TrackPoint, TrackData } from '../gpx-file/gpx-file.model';
 import { SceneService } from '../scene/scene.service';
 
 @Injectable({
@@ -94,7 +94,7 @@ export class Track3dService {
   }
 
   private _build3dTrack(
-    gpxStatistics: TrackStatistics,
+    gpxStatistics: TrackData,
     zScale: number,
     origin: THREE.Vector3,
     interpolated: boolean

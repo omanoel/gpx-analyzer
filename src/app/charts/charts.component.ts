@@ -168,12 +168,14 @@ export class ChartsComponent implements OnInit {
         {
           name: 'original',
           type: chartType,
-          data: originalData
+          data: originalData,
+          smooth: true
         },
         {
           name: 'interpolated',
           type: chartType,
-          data: interpolatedData
+          data: interpolatedData,
+          smooth: true
         }
       ]
     };

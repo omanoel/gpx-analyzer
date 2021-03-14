@@ -22,10 +22,21 @@
     </form>
   </div>
   <div class="two-columns">
-    <div class="flex-column">
+    <div class="column">
+      <div>
+        <span *ngFor="let key of Object.keys(item.statistics.trkPoints[0])">
+          {{ key }}; </span
+        ><br />
+      </div>
+      <div *ngFor="let trkPoint of item.statistics.trkPoints">
+        <span *ngFor="let key of Object.keys(trkPoint)">
+          {{ trkPoint[key] }}; </span
+        ><br />
+      </div>
+      <!--
       <table>
         <caption>
-          Data
+          Original Data
         </caption>
         <thead>
           <tr>
@@ -42,7 +53,7 @@
       </table>
       <table>
         <caption>
-          Data
+          Interpolated Data
         </caption>
         <thead>
           <tr>
@@ -57,6 +68,7 @@
           </tr>
         </tbody>
       </table>
+      -->
     </div>
   </div>
 </section>

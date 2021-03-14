@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { GpxFile, TrackPoint, TrackStatistics } from './gpx-file.model';
+import { GpxFile, TrackPoint, TrackData } from './gpx-file.model';
 
 import * as proj4x from 'proj4';
-import { COLORS } from '../colors.constant';
 const proj4 = (proj4x as any).default;
+import { COLORS } from '../colors.constant';
 
 @Injectable({
   providedIn: 'root'
@@ -18,26 +18,28 @@ export class GpxFileService {
     jsonData: any,
     interpolationStep: number
   ): GpxFile {
-    const statistics = this._buildStatistics(jsonData);
+    const original = this._buildOriginal(jsonData);
+    const originalCleaned = this._cleanOriginal(original);
     const interpolated = this._buildInterpolatedStatistics(
-      statistics,
+      originalCleaned,
       interpolationStep
     );
     return {
       title: file.name,
       data: jsonData,
-      statistics: statistics,
+      original: original,
+      statistics: originalCleaned,
       interpolated: interpolated,
       date: file.lastModifiedDate
     };
   }
 
-  private _buildStatistics(jsonData: any): TrackStatistics {
+  private _buildOriginal(jsonData: any): TrackData {
     if (jsonData?.gpx?.trk == null) {
       return null;
     }
     const track = jsonData.gpx.trk;
-    const stats: TrackStatistics = this._initStatistics(track.name);
+    const stats: TrackData = this._initData(track.name);
     if (track.trkseg?.trkpt == null) {
       return stats;
     }
@@ -50,11 +52,53 @@ export class GpxFileService {
       trackPoint.datetime = new Date(s['time']).getTime();
       return trackPoint;
     });
-    this._computeStatistics(stats, false);
+    this._computeData(stats, false);
     return stats;
   }
 
-  private _initStatistics(title: string): TrackStatistics {
+  private _cleanOriginal(original: TrackData): TrackData {
+    const cleanedData: TrackData = Object.assign({}, original);
+    let variance = 0;
+    cleanedData.trkPoints.forEach(
+      (p) =>
+        (variance +=
+          (p.speed - original.speedMove) * (p.speed - original.speedMove))
+    );
+    variance = Math.sqrt(variance / (original.trkPoints.length - 1));
+    cleanedData.trkPoints = original.trkPoints.map((p, i) => {
+      if (i > 0) {
+        if (Math.abs(p.speed - original.trkPoints[i - 1].speed) > variance) {
+          // clean speed + datetime by recompute
+        }
+      }
+      return p;
+    });
+    return cleanedData;
+  }
+
+  private _buildStatistics(jsonData: any): TrackData {
+    if (jsonData?.gpx?.trk == null) {
+      return null;
+    }
+    const track = jsonData.gpx.trk;
+    const stats: TrackData = this._initData(track.name);
+    if (track.trkseg?.trkpt == null) {
+      return stats;
+    }
+    const trkPt: any[] = track.trkseg.trkpt;
+    stats.trkPoints = trkPt.map((s: any) => {
+      const trackPoint = this._initTrackPoint();
+      trackPoint.lon = +s['@']['@_lon'];
+      trackPoint.lat = +s['@']['@_lat'];
+      trackPoint.altitude = +s['ele'];
+      trackPoint.datetime = new Date(s['time']).getTime();
+      return trackPoint;
+    });
+    this._computeData(stats, false);
+    return stats;
+  }
+
+  private _initData(title: string): TrackData {
     return {
       title: title,
       distance: 0,
@@ -106,10 +150,7 @@ export class GpxFileService {
     };
   }
 
-  private _computeStatistics(
-    stats: TrackStatistics,
-    interpolated: boolean
-  ): void {
+  private _computeData(stats: TrackData, interpolated: boolean): void {
     let length = 0;
     const lon0 = stats.trkPoints[0].lon;
     const lat0 = stats.trkPoints[0].lat;
@@ -214,7 +255,7 @@ export class GpxFileService {
     return 0;
   }
 
-  private _setBoundaries(stats: TrackStatistics, trackPoint: TrackPoint): void {
+  private _setBoundaries(stats: TrackData, trackPoint: TrackPoint): void {
     stats.latMin =
       trackPoint.lat < stats.latMin ? trackPoint.lat : stats.latMin;
     stats.latMax =
@@ -243,10 +284,10 @@ export class GpxFileService {
   }
 
   private _buildInterpolatedStatistics(
-    statistics: TrackStatistics,
+    statistics: TrackData,
     interpolationStep: number
-  ): TrackStatistics {
-    const interpolatedStats = this._initStatistics(statistics.title);
+  ): TrackData {
+    const interpolatedStats = this._initData(statistics.title);
     let maxDistance = 0;
     interpolatedStats.trkPoints.push(statistics.trkPoints[0]);
     maxDistance += interpolationStep;
@@ -263,7 +304,7 @@ export class GpxFileService {
         maxDistance += interpolationStep;
       }
     }
-    this._computeStatistics(interpolatedStats, true);
+    this._computeData(interpolatedStats, true);
     return interpolatedStats;
   }
 
