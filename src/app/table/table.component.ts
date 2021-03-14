@@ -68,6 +68,10 @@ export class TableComponent implements OnInit {
     this.onClose.emit();
   }
 
+  public get Object(): typeof Object {
+    return Object;
+  }
+
   private _initForm(): void {
     this.axisForm = new FormGroup({});
     this.xAxisFc = new FormControl('deltaDistance0', [Validators.required]);

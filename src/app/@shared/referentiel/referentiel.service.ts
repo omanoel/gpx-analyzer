@@ -112,19 +112,15 @@ export class ReferentielService {
     distance: number,
     origin: THREE.Vector3
   ): THREE.Line {
-    const geometryX = new THREE.Geometry();
-    geometryX.vertices.push(
-      new THREE.Vector3(
-        origin.x + distance * index * axisX - distance * axisY * 10,
-        origin.y + distance * index * axisY - distance * axisX * 10,
-        origin.z
-      ),
-      new THREE.Vector3(
-        origin.x + distance * index * axisX + distance * axisY * 10,
-        origin.y + distance * index * axisY + distance * axisX * 10,
-        origin.z
-      )
-    );
+    const geometryX = new THREE.BufferGeometry();
+    const positions = new Float32Array(2 * 3); // 3 vertices per point
+    positions[0] = origin.x + distance * index * axisX - distance * axisY * 10;
+    positions[1] = origin.y + distance * index * axisY - distance * axisX * 10;
+    positions[2] = origin.z;
+    positions[3] = origin.x + distance * index * axisX + distance * axisY * 10;
+    positions[4] = origin.y + distance * index * axisY + distance * axisX * 10;
+    positions[5] = origin.z;
+    geometryX.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     return new THREE.Line(geometryX, material);
   }
 }

@@ -2,12 +2,13 @@ export interface GpxFile {
   id?: number;
   title: string;
   data: any;
-  statistics: TrackStatistics;
-  interpolated: TrackStatistics;
+  original: TrackData;
+  statistics: TrackData;
+  interpolated: TrackData;
   date: Date;
 }
 
-export interface TrackStatistics {
+export interface TrackData {
   title: string;
   distance: number;
   delayTotal: number;
@@ -53,6 +54,7 @@ export interface TrackPoint {
   temperature: number;
   windSpeed: number;
   windDirection: WindDirectionEnum;
+  [key: string]: number | WindDirectionEnum;
 }
 
 export enum WindDirectionEnum {
