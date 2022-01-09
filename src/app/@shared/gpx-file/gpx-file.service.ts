@@ -46,8 +46,8 @@ export class GpxFileService {
     const trkPt: any[] = track.trkseg.trkpt;
     stats.trkPoints = trkPt.map((s: any) => {
       const trackPoint = this._initTrackPoint();
-      trackPoint.lon = +s['@']['@_lon'];
-      trackPoint.lat = +s['@']['@_lat'];
+      trackPoint.lon = +s['@_lon'];
+      trackPoint.lat = +s['@_lat'];
       trackPoint.altitude = +s['ele'];
       trackPoint.datetime = new Date(s['time']).getTime();
       return trackPoint;
@@ -88,8 +88,8 @@ export class GpxFileService {
     const trkPt: any[] = track.trkseg.trkpt;
     stats.trkPoints = trkPt.map((s: any) => {
       const trackPoint = this._initTrackPoint();
-      trackPoint.lon = +s['@']['@_lon'];
-      trackPoint.lat = +s['@']['@_lat'];
+      trackPoint.lon = +s['@_lon'];
+      trackPoint.lat = +s['@_lat'];
       trackPoint.altitude = +s['ele'];
       trackPoint.datetime = new Date(s['time']).getTime();
       return trackPoint;

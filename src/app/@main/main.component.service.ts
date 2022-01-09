@@ -86,7 +86,8 @@ export class MainComponentService {
     //
     mainComponentModel.scene = this._sceneService.initialize();
     //
-    mainComponentModel.trackballControls = this._trackballControlsService.initialize();
+    mainComponentModel.trackballControls =
+      this._trackballControlsService.initialize();
     //
     mainComponentModel.raycaster = this._raycasterService.initialize();
     //

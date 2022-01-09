@@ -64,7 +64,7 @@ export class TableComponent implements OnInit {
     this._initTable(this.xAxisFc.value, this.yAxisFc.value);
   }
 
-  close(): void {
+  close($event: MouseEvent): void {
     this.onClose.emit();
   }
 
@@ -76,8 +76,8 @@ export class TableComponent implements OnInit {
     this.axisForm = new FormGroup({});
     this.xAxisFc = new FormControl('deltaDistance0', [Validators.required]);
     this.yAxisFc = new FormControl('speed', [Validators.required]);
-    this.axisForm.addControl('xAxis', this.xAxisFc);
-    this.axisForm.addControl('yAxis', this.yAxisFc);
+    this.axisForm.addControl('xAxisFc', this.xAxisFc);
+    this.axisForm.addControl('yAxisFc', this.yAxisFc);
     this.axisForm.valueChanges.subscribe(() => {
       // init table
       this._initTable(this.xAxisFc.value, this.yAxisFc.value);

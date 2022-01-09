@@ -1,4 +1,4 @@
-<app-main></app-main>
+<app-main *ngIf="isWebGLAvailable"></app-main>
 <div class="language">
   <label>
     {{ 'HOME.SELECT' | translate }}

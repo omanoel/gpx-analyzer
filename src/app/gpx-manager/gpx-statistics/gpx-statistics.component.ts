@@ -50,7 +50,7 @@ export class GpxStatisticsComponent implements OnInit {
     //
   }
 
-  close(): void {
+  close($event: MouseEvent): void {
     this.onClose.emit();
   }
 
