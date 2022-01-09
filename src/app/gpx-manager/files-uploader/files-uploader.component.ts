@@ -9,11 +9,10 @@ import {
   Input
 } from '@angular/core';
 import { GpxFileDbService } from '../../@shared/gpx-file/gpx-file-db.service';
-import * as XmlParser from 'fast-xml-parser';
 import { TranslateService } from '@ngx-translate/core';
 import { GpxFileService } from 'src/app/@shared/gpx-file/gpx-file.service';
 import { MainComponentModel } from 'src/app/@main/main.component.model';
-
+import { X2jOptionsOptional, XMLParser } from 'fast-xml-parser';
 @Component({
   selector: 'app-files-uploader',
   templateUrl: './files-uploader.component.html',
@@ -130,19 +129,11 @@ export class FilesUploaderComponent {
   }
 
   private _transformXmlToJson(data: any): any {
-    const defaultOptions: XmlParser.J2xOptions = {
-      attributeNamePrefix: '@_',
-      attrNodeName: '@', //default is false
-      textNodeName: '#text',
+    const defaultOptions: X2jOptionsOptional = {
       ignoreAttributes: false,
-      cdataTagName: '__cdata', //default is false
-      cdataPositionChar: '\\c',
-      format: false,
-      indentBy: '  ',
-      supressEmptyNode: false,
-      tagValueProcessor: (a: string) => a, // default is a=>a
-      attrValueProcessor: (a) => a
+      attributeNamePrefix: '@_',
+      allowBooleanAttributes: false
     };
-    return XmlParser.parse(<string>data, defaultOptions);
+    return new XMLParser(defaultOptions).parse(<string>data);
   }
 }

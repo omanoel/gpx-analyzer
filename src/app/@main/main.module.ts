@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
-import { DndDirective } from '../gpx-manager/files-uploader/dnd.diective';
+import { DndDirective } from '../gpx-manager/files-uploader/dnd.directive';
 import { FilesUploaderComponent } from '../gpx-manager/files-uploader/files-uploader.component';
 import { GpxManagerComponent } from '../gpx-manager/gpx-manager.component';
 import { GpxStatisticsComponent } from '../gpx-manager/gpx-statistics/gpx-statistics.component';

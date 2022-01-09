@@ -73,9 +73,9 @@ export class ChartsComponent implements OnInit {
     this.xAxisFc = new FormControl('deltaDistance0', [Validators.required]);
     this.yAxisFc = new FormControl('speed', [Validators.required]);
     this.chartTypeFc = new FormControl('line', [Validators.required]);
-    this.axisForm.addControl('xAxis', this.xAxisFc);
-    this.axisForm.addControl('yAxis', this.yAxisFc);
-    this.axisForm.addControl('chartType', this.chartTypeFc);
+    this.axisForm.addControl('xAxisFc', this.xAxisFc);
+    this.axisForm.addControl('yAxisFc', this.yAxisFc);
+    this.axisForm.addControl('chartTypeFc', this.chartTypeFc);
     this.axisForm.valueChanges.subscribe(() => {
       // init chart
       this._initChart(
