@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
+import { Vector3 } from 'three';
 
 import { MainComponentModel } from '../@main/main.component.model';
 
@@ -11,7 +12,7 @@ import { MainComponentModel } from '../@main/main.component.model';
 export class IndicatorsComponent implements OnInit {
   //
   @Input() model: MainComponentModel;
-  public target: THREE.Vector3;
+  public target: Vector3;
   public expanded = true;
   //
   constructor(public translate: TranslateService) {}

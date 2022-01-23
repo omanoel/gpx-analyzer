@@ -1,6 +1,5 @@
-import * as THREE from 'three';
-
 import { Injectable } from '@angular/core';
+import { Raycaster } from 'three';
 
 @Injectable({
   providedIn: 'root'
@@ -10,9 +9,9 @@ export class RaycasterService {
     // Empty
   }
 
-  public initialize(): THREE.Raycaster {
+  public initialize(): Raycaster {
     // TODO: find how to update this parameter
     // this.raycaster.linePrecision = 3;
-    return new THREE.Raycaster();
+    return new Raycaster();
   }
 }

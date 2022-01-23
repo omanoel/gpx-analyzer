@@ -4,6 +4,8 @@ import { GpxFile, TrackPoint, TrackData } from './gpx-file.model';
 import * as proj4x from 'proj4';
 const proj4 = (proj4x as any).default;
 import { COLORS } from '../colors.constant';
+import { RdpSimplify } from '../rdp-algorithm/rdb-simplify.service';
+import { isDate } from 'lodash';
 
 @Injectable({
   providedIn: 'root'
@@ -19,6 +21,7 @@ export class GpxFileService {
     interpolationStep: number
   ): GpxFile {
     const original = this._buildOriginal(jsonData);
+    const rdpSimplified = this._applyRdpAlgorithm(original);
     const originalCleaned = this._cleanOriginal(original);
     const interpolated = this._buildInterpolatedStatistics(
       originalCleaned,
@@ -28,6 +31,7 @@ export class GpxFileService {
       title: file.name,
       data: jsonData,
       original: original,
+      rdpSimplified: rdpSimplified,
       statistics: originalCleaned,
       interpolated: interpolated,
       date: file.lastModifiedDate
@@ -44,14 +48,22 @@ export class GpxFileService {
       return stats;
     }
     const trkPt: any[] = track.trkseg.trkpt;
-    stats.trkPoints = trkPt.map((s: any) => {
-      const trackPoint = this._initTrackPoint();
-      trackPoint.lon = +s['@_lon'];
-      trackPoint.lat = +s['@_lat'];
-      trackPoint.altitude = +s['ele'];
-      trackPoint.datetime = new Date(s['time']).getTime();
-      return trackPoint;
-    });
+    stats.trkPoints = trkPt
+      .map((s: any) => {
+        const trackPoint = this._initTrackPoint();
+        trackPoint.lon = +s['@_lon'];
+        trackPoint.lat = +s['@_lat'];
+        trackPoint.altitude = +s['ele'];
+        trackPoint.datetime = new Date(s['time']).getTime();
+        return trackPoint;
+      })
+      .filter(
+        (trackP) =>
+          !isNaN(trackP.lon) &&
+          !isNaN(trackP.lat) &&
+          !isNaN(trackP.altitude) &&
+          !isDate(trackP.datetime)
+      );
     this._computeData(stats, false);
     return stats;
   }
@@ -360,5 +372,30 @@ export class GpxFileService {
       return previous;
     }
     return previous + ratio * (next - previous);
+  }
+
+  private _applyRdpAlgorithm(original: TrackData): TrackData {
+    const lines = original.trkPoints.map((trackPoint: TrackPoint) => [
+      trackPoint.x,
+      trackPoint.y
+    ]);
+    let simplifiedLines = RdpSimplify.applyAlgorithm(lines, 1);
+    const simplifiedData: TrackData = Object.assign({}, original);
+    simplifiedData.trkPoints = simplifiedData.trkPoints.filter(
+      (trackPoint: TrackPoint) => {
+        let findIdx = -1;
+        const find = simplifiedLines.find((sLine, idx) => {
+          findIdx = idx;
+          return sLine[0] === trackPoint.x && sLine[1] === trackPoint.y;
+        });
+        if (findIdx !== -1) {
+          simplifiedLines = simplifiedLines.filter(
+            (value, idx) => idx !== findIdx
+          );
+        }
+        return findIdx !== -1;
+      }
+    );
+    return simplifiedData;
   }
 }

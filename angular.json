@@ -37,6 +37,11 @@
             "scripts": []
           },
           "configurations": {
+            "development": {
+              "sourceMap": true,
+              "buildOptimizer": false,
+              "optimization": false
+            },
             "production": {
               "fileReplacements": [
                 {
@@ -72,6 +77,9 @@
             "browserTarget": "gpx-analyzer:build"
           },
           "configurations": {
+            "development": {
+              "browserTarget": "gpx-analyzer:build:development"
+            },
             "production": {
               "browserTarget": "gpx-analyzer:build:production"
             }
