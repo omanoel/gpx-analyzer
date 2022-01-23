@@ -1,6 +1,5 @@
-import * as THREE from 'three';
-
 import { Injectable, SimpleChanges } from '@angular/core';
+import { Vector3, PerspectiveCamera } from 'three';
 import { MainComponentModel } from '../../@main/main.component.model';
 
 @Injectable({
@@ -13,7 +12,7 @@ export class PerspectiveCameraService {
   private static readonly FAR = 1e12;
   private static readonly DEFAULT_ASPECT = 1;
 
-  public previousPositionOfCamera: THREE.Vector3 = new THREE.Vector3(0, 0, 0);
+  public previousPositionOfCamera: Vector3 = new Vector3(0, 0, 0);
   public alreadyChecked = false;
 
   constructor() {
@@ -24,8 +23,8 @@ export class PerspectiveCameraService {
     width: number,
     height: number,
     coord: number
-  ): THREE.PerspectiveCamera {
-    const camera = new THREE.PerspectiveCamera(
+  ): PerspectiveCamera {
+    const camera = new PerspectiveCamera(
       PerspectiveCameraService.VIEW_ANGLE,
       PerspectiveCameraService.DEFAULT_ASPECT,
       PerspectiveCameraService.NEAR,
@@ -34,23 +33,20 @@ export class PerspectiveCameraService {
     camera.translateX(coord);
     camera.translateY(coord);
     camera.translateZ(coord);
-    camera.up = new THREE.Vector3(0, 0, 1);
+    camera.up = new Vector3(0, 0, 1);
     this._updateAspect(camera, width, height);
     return camera;
   }
 
   public updateCamera(
-    camera: THREE.PerspectiveCamera,
+    camera: PerspectiveCamera,
     width: number,
     height: number
   ): void {
     this._updateAspect(camera, width, height);
   }
 
-  public onChanges(
-    camera: THREE.PerspectiveCamera,
-    changes: SimpleChanges
-  ): void {
+  public onChanges(camera: PerspectiveCamera, changes: SimpleChanges): void {
     const widthChng = changes.width && changes.width.currentValue;
     const heightChng = changes.height && changes.height.currentValue;
 
@@ -83,7 +79,7 @@ export class PerspectiveCameraService {
   }
 
   private _updateAspect(
-    camera: THREE.PerspectiveCamera,
+    camera: PerspectiveCamera,
     width: number,
     height: number
   ) {

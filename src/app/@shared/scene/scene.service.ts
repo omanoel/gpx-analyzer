@@ -1,6 +1,5 @@
-import * as THREE from 'three';
-
 import { Injectable } from '@angular/core';
+import { Scene, Object3D } from 'three';
 
 @Injectable({
   providedIn: 'root'
@@ -10,11 +9,11 @@ export class SceneService {
     // Empty
   }
 
-  public initialize(): THREE.Scene {
-    return new THREE.Scene();
+  public initialize(): Scene {
+    return new Scene();
   }
 
-  public getTack3ds(scene: THREE.Scene): THREE.Object3D[] {
+  public getTack3ds(scene: Scene): Object3D[] {
     return scene.children.filter((obj) => obj.userData['stats']);
   }
 }

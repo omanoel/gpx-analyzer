@@ -1,5 +1,3 @@
-import * as THREE from 'three';
-
 import { ElementRef, Injectable, NgZone, SimpleChanges } from '@angular/core';
 
 import { PerspectiveCameraService } from '../@shared/perspective-camera/perspective-camera.service';
@@ -10,6 +8,7 @@ import { MainComponentModel } from './main.component.model';
 import { ReferentielService } from '../@shared/referentiel/referentiel.service';
 import { TargetService } from '../@shared/target/target.service';
 import { Track3dService } from '../@shared/track/track3d.service';
+import { WebGLRenderer, Vector2, Vector3 } from 'three';
 
 @Injectable({
   providedIn: 'root'
@@ -28,7 +27,7 @@ export class MainComponentService {
 
   public initModel(element: ElementRef): MainComponentModel {
     return {
-      renderer: new THREE.WebGLRenderer({
+      renderer: new WebGLRenderer({
         antialias: true
       }),
       frameId: null,
@@ -38,7 +37,7 @@ export class MainComponentService {
       scene: null,
       trackballControls: null,
       raycaster: null,
-      mouse: new THREE.Vector2(),
+      mouse: new Vector2(),
       myObjectOver: null,
       currentIntersected: null,
       lastObjectIntersected: null,
@@ -106,7 +105,7 @@ export class MainComponentService {
 
     mainComponentModel.camera.position.y = 50000;
     mainComponentModel.camera.position.z = 50000;
-    //this.fog =  new THREE.FogExp2( 0xffffff, 0.015 );
+    //this.fog =  new FogExp2( 0xffffff, 0.015 );
     mainComponentModel.scene.add(mainComponentModel.camera);
     //
     this._targetService.create(
@@ -249,8 +248,8 @@ export class MainComponentService {
     this._animate(mainComponentModel);
   }
 
-  private _getOrigin(mainComponentModel: MainComponentModel): THREE.Vector3 {
-    const origin = new THREE.Vector3();
+  private _getOrigin(mainComponentModel: MainComponentModel): Vector3 {
+    const origin = new Vector3();
     let minX = Number.POSITIVE_INFINITY;
     let minY = Number.POSITIVE_INFINITY;
     let maxX = Number.NEGATIVE_INFINITY;

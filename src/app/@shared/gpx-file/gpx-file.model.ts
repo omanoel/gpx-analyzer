@@ -5,6 +5,7 @@ export interface GpxFile {
   original: TrackData;
   statistics: TrackData;
   interpolated: TrackData;
+  rdpSimplified: TrackData; // Ramer Douglas Peucker algorithm
   date: Date;
 }
 

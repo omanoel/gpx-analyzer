@@ -1,5 +1,3 @@
-import * as THREE from 'three';
-
 import { ElementRef } from '@angular/core';
 
 import { TrackballControlsModel } from '../@shared/trackball-controls/trackball-controls.model';
@@ -7,20 +5,29 @@ import { ReferentielModel } from '../@shared/referentiel/referentiel.model';
 import { TargetModel } from '../@shared/target/target.model';
 import { GpxFile } from '../@shared/gpx-file/gpx-file.model';
 import { MenuModel } from '../menu/menu.model';
+import {
+  WebGLRenderer,
+  Scene,
+  PerspectiveCamera,
+  Raycaster,
+  Vector2,
+  Object3D,
+  Vector3
+} from 'three';
 
 export interface MainComponentModel {
   element: ElementRef;
-  renderer: THREE.WebGLRenderer;
+  renderer: WebGLRenderer;
   frameId: number;
-  scene: THREE.Scene;
-  camera: THREE.PerspectiveCamera;
+  scene: Scene;
+  camera: PerspectiveCamera;
   referentiel: ReferentielModel;
   trackballControls: TrackballControlsModel;
-  raycaster: THREE.Raycaster;
-  mouse: THREE.Vector2;
+  raycaster: Raycaster;
+  mouse: Vector2;
   myObjectOver: ObjectOver;
-  currentIntersected: THREE.Object3D;
-  lastObjectIntersected: THREE.Object3D;
+  currentIntersected: Object3D;
+  lastObjectIntersected: Object3D;
   average: string;
   height: number;
   width: number;
@@ -34,7 +41,7 @@ export interface MainComponentModel {
   dateCurrent: number;
   showProperMotion: boolean;
   changeOnShowProperMotion: boolean;
-  track3ds: THREE.Object3D[];
+  track3ds: Object3D[];
   target: TargetModel;
   countObjects: number;
   zScale: number;
@@ -42,11 +49,11 @@ export interface MainComponentModel {
   needsUpdate: boolean;
   needsRemove: boolean;
   gpxFiles: GpxFile[];
-  firstPosition: THREE.Vector3;
+  firstPosition: Vector3;
   menu: MenuModel;
 }
 
 export interface ObjectOver {
-  objectIntersected: THREE.Object3D;
-  objectDisplay: THREE.Object3D;
+  objectIntersected: Object3D;
+  objectDisplay: Object3D;
 }

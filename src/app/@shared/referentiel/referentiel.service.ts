@@ -1,8 +1,16 @@
-import * as THREE from 'three';
-
 import { Injectable } from '@angular/core';
 
 import { ReferentielModel } from './referentiel.model';
+import {
+  PerspectiveCamera,
+  Object3D,
+  Vector3,
+  Scene,
+  Line,
+  LineBasicMaterial,
+  BufferGeometry,
+  BufferAttribute
+} from 'three';
 
 @Injectable({
   providedIn: 'root'
@@ -16,15 +24,15 @@ export class ReferentielService {
     // Empty
   }
 
-  public initialize(camera: THREE.PerspectiveCamera): ReferentielModel {
+  public initialize(camera: PerspectiveCamera): ReferentielModel {
     const color = 0xffffff;
-    const distance = 1000; // camera.position.distanceTo(new THREE.Vector3(0, 0, 0));
-    const referentiel3d = new THREE.Object3D();
+    const distance = 1000; // camera.position.distanceTo(new Vector3(0, 0, 0));
+    const referentiel3d = new Object3D();
     referentiel3d.add(
-      ...this._buildObjects(color, distance, new THREE.Vector3(0, 0, 0))
+      ...this._buildObjects(color, distance, new Vector3(0, 0, 0))
     );
     return {
-      origin: new THREE.Vector3(0, 0, 0),
+      origin: new Vector3(0, 0, 0),
       distReference: distance,
       objects: referentiel3d
     };
@@ -32,11 +40,11 @@ export class ReferentielService {
 
   public update(
     referentiel: ReferentielModel,
-    scene: THREE.Scene,
-    camera: THREE.PerspectiveCamera,
-    center: THREE.Vector3
+    scene: Scene,
+    camera: PerspectiveCamera,
+    center: Vector3
   ): void {
-    // const dist = camera.position.distanceTo(new THREE.Vector3(0, 0, 0));
+    // const dist = camera.position.distanceTo(new Vector3(0, 0, 0));
     if (!this._init) {
       this._init = true;
       this._updateObjects(referentiel, scene);
@@ -55,10 +63,7 @@ export class ReferentielService {
     */
   }
 
-  private _updateObjects(
-    referentiel: ReferentielModel,
-    scene: THREE.Scene
-  ): void {
+  private _updateObjects(referentiel: ReferentielModel, scene: Scene): void {
     scene.remove(referentiel.objects);
     const color = 0xffffff;
     referentiel.objects.children.length = 0;
@@ -75,27 +80,27 @@ export class ReferentielService {
   private _buildObjects(
     color: number,
     distance: number,
-    origin: THREE.Vector3
-  ): THREE.Line[] {
+    origin: Vector3
+  ): Line[] {
     return this._buildLinesXY(color, distance, origin);
   }
 
   private _buildLinesXY(
     color: number,
     distance: number,
-    origin: THREE.Vector3
-  ): THREE.Line[] {
-    const materialMajor = new THREE.LineBasicMaterial({
+    origin: Vector3
+  ): Line[] {
+    const materialMajor = new LineBasicMaterial({
       color: color,
       transparent: true,
       opacity: 0.2
     });
-    const materialMinor = new THREE.LineBasicMaterial({
+    const materialMinor = new LineBasicMaterial({
       color: color,
       transparent: true,
       opacity: 0.1
     });
-    const lines: THREE.Line[] = [];
+    const lines: Line[] = [];
     for (let i = -10; i < 11; i++) {
       const material = i % 10 === 0 ? materialMajor : materialMinor;
       lines.push(this._buildLine(material, i, 1, 0, distance, origin));
@@ -105,14 +110,14 @@ export class ReferentielService {
   }
 
   private _buildLine(
-    material: THREE.LineBasicMaterial,
+    material: LineBasicMaterial,
     index: number,
     axisX: number,
     axisY: number,
     distance: number,
-    origin: THREE.Vector3
-  ): THREE.Line {
-    const geometryX = new THREE.BufferGeometry();
+    origin: Vector3
+  ): Line {
+    const geometryX = new BufferGeometry();
     const positions = new Float32Array(2 * 3); // 3 vertices per point
     positions[0] = origin.x + distance * index * axisX - distance * axisY * 10;
     positions[1] = origin.y + distance * index * axisY - distance * axisX * 10;
@@ -120,7 +125,7 @@ export class ReferentielService {
     positions[3] = origin.x + distance * index * axisX + distance * axisY * 10;
     positions[4] = origin.y + distance * index * axisY + distance * axisX * 10;
     positions[5] = origin.z;
-    geometryX.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    return new THREE.Line(geometryX, material);
+    geometryX.setAttribute('position', new BufferAttribute(positions, 3));
+    return new Line(geometryX, material);
   }
 }

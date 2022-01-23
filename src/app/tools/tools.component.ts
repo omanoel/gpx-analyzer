@@ -3,6 +3,7 @@ import { TranslateService } from '@ngx-translate/core';
 
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { MainComponentModel } from '../@main/main.component.model';
+import { Object3D } from 'three';
 
 @Component({
   selector: 'app-tools',
@@ -41,7 +42,7 @@ export class ToolsComponent implements OnInit, OnDestroy {
     // unsubsribe
   }
 
-  public get tracks(): THREE.Object3D[] {
+  public get tracks(): Object3D[] {
     return this.model.track3ds;
   }
 }

@@ -1,5 +1,15 @@
 import { Injectable } from '@angular/core';
-import * as THREE from 'three';
+import {
+  Vector3,
+  Object3D,
+  LineBasicMaterial,
+  Color,
+  Mesh,
+  BoxGeometry,
+  MeshBasicMaterial,
+  BufferGeometry,
+  Line
+} from 'three';
 import { MainComponentModel } from '../../@main/main.component.model';
 import { TrackPoint, TrackData } from '../gpx-file/gpx-file.model';
 import { SceneService } from '../scene/scene.service';
@@ -19,7 +29,7 @@ export class Track3dService {
         mainComponentModel.firstPosition.y === 0 &&
         mainComponentModel.firstPosition.z === 0)
     ) {
-      mainComponentModel.firstPosition = new THREE.Vector3(0, 0, 0);
+      mainComponentModel.firstPosition = new Vector3(0, 0, 0);
       if (mainComponentModel.gpxFiles.length > 0) {
         mainComponentModel.firstPosition.setX(
           mainComponentModel.gpxFiles[0].statistics.trkPoints[0].x
@@ -45,9 +55,9 @@ export class Track3dService {
 
   private _add3dTracks(
     mainComponentModel: MainComponentModel,
-    origin: THREE.Vector3
+    origin: Vector3
   ): void {
-    const obj3dsToAdd: THREE.Object3D[] = [];
+    const obj3dsToAdd: Object3D[] = [];
     mainComponentModel.gpxFiles.forEach((gpxFile) => {
       if (
         !this._sceneService
@@ -78,7 +88,7 @@ export class Track3dService {
   }
 
   private _remove3dTracks(mainComponentModel: MainComponentModel): void {
-    const obj3dsToRemove: THREE.Object3D[] = [];
+    const obj3dsToRemove: Object3D[] = [];
     this._sceneService.getTack3ds(mainComponentModel.scene).forEach((obj3d) => {
       if (
         !mainComponentModel.gpxFiles.find(
@@ -96,51 +106,51 @@ export class Track3dService {
   private _build3dTrack(
     gpxStatistics: TrackData,
     zScale: number,
-    origin: THREE.Vector3,
+    origin: Vector3,
     interpolated: boolean
-  ): THREE.Object3D {
-    const track = new THREE.Object3D();
+  ): Object3D {
+    const track = new Object3D();
     track.name = gpxStatistics.title;
-    const track3dChildren = new THREE.Object3D();
+    const track3dChildren = new Object3D();
     const colors: number[] = gpxStatistics.colors;
     const i = interpolated ? 0.1 : 0;
     const r = colors[0] / 255;
     const g = colors[1] / 255 + i;
     const b = colors[2] / 255;
 
-    const materialTrackSeg = new THREE.LineBasicMaterial({
-      color: new THREE.Color(r, g, b),
+    const materialTrackSeg = new LineBasicMaterial({
+      color: new Color(r, g, b),
       transparent: true,
       opacity: interpolated ? 0.5 : 1
     });
-    const meshes: THREE.Mesh[] = [];
-    const points: THREE.Vector3[] = [];
+    const meshes: Mesh[] = [];
+    const points: Vector3[] = [];
     const deltaXOrigin = gpxStatistics.trkPoints[0].x - origin.x;
     const deltaYOrigin = gpxStatistics.trkPoints[0].y - origin.y;
     const deltaZOrigin = gpxStatistics.trkPoints[0].altitude - origin.z;
 
     gpxStatistics.trkPoints.forEach((tkpt: TrackPoint) => {
       points.push(
-        new THREE.Vector3(
+        new Vector3(
           deltaXOrigin + tkpt.deltaX0,
           deltaYOrigin + tkpt.deltaY0,
           deltaZOrigin + tkpt.deltaZ0 * zScale
         )
       );
-      const geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
+      const geometry = new BoxGeometry(0.2, 0.2, 0.2);
       geometry.translate(
         deltaXOrigin + tkpt.deltaX0,
         deltaYOrigin + tkpt.deltaY0,
         deltaZOrigin + tkpt.deltaZ0 * zScale
       );
-      const material = new THREE.MeshBasicMaterial({
-        color: new THREE.Color(r, g, b)
+      const material = new MeshBasicMaterial({
+        color: new Color(r, g, b)
       });
-      meshes.push(new THREE.Mesh(geometry, material));
+      meshes.push(new Mesh(geometry, material));
     });
 
-    const geometry = new THREE.BufferGeometry().setFromPoints(points);
-    track3dChildren.add(new THREE.Line(geometry, materialTrackSeg));
+    const geometry = new BufferGeometry().setFromPoints(points);
+    track3dChildren.add(new Line(geometry, materialTrackSeg));
     track3dChildren.add(...meshes);
     track.add(track3dChildren);
     track.userData['stats'] = gpxStatistics;

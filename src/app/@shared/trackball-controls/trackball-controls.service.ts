@@ -1,11 +1,11 @@
 import { Subject } from 'rxjs';
-import * as THREE from 'three';
 import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls.js';
 
 import { Injectable } from '@angular/core';
 
 import { TrackballControlsModel } from './trackball-controls.model';
 import { MainComponentModel } from '../../@main/main.component.model';
+import { Vector3 } from 'three';
 
 @Injectable({ providedIn: 'root' })
 export class TrackballControlsService {
@@ -18,7 +18,7 @@ export class TrackballControlsService {
       controls: null,
       enabled: true,
       eventControls: null,
-      target$: new Subject<THREE.Vector3>()
+      target$: new Subject<Vector3>()
     };
   }
 

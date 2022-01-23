@@ -1,9 +1,8 @@
-import * as THREE from 'three';
-
 import { Injectable } from '@angular/core';
 
 import { TargetModel } from './target.model';
 import { MainComponentModel } from '../../@main/main.component.model';
+import { AxesHelper, Scene, Vector3, Camera } from 'three';
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +18,7 @@ export class TargetService {
 
   public initialize(): TargetModel {
     return {
-      axesHelper: new THREE.AxesHelper(TargetService.SCALE),
+      axesHelper: new AxesHelper(TargetService.SCALE),
       ratio: 1,
       targetOnClick: null,
       cameraOnClick: null,
@@ -27,11 +26,7 @@ export class TargetService {
     };
   }
 
-  public create(
-    target: TargetModel,
-    myScene: THREE.Scene,
-    myPoint: THREE.Vector3
-  ): void {
+  public create(target: TargetModel, myScene: Scene, myPoint: Vector3): void {
     target.axesHelper.translateX(myPoint.x);
     target.axesHelper.translateY(myPoint.y);
     target.axesHelper.translateZ(myPoint.z);
@@ -40,13 +35,13 @@ export class TargetService {
 
   public updateAxesHelper(
     target: TargetModel,
-    myNewPoint: THREE.Vector3,
-    camera: THREE.Camera
+    myNewPoint: Vector3,
+    camera: Camera
   ): void {
     if (!target.ratio) {
       target.ratio = camera.position.distanceTo(myNewPoint);
     }
-    const oldPosition = new THREE.Vector3().copy(target.axesHelper.position);
+    const oldPosition = new Vector3().copy(target.axesHelper.position);
     target.axesHelper.translateX(myNewPoint.x - oldPosition.x);
     target.axesHelper.translateY(myNewPoint.y - oldPosition.y);
     target.axesHelper.translateZ(myNewPoint.z - oldPosition.z);
@@ -57,13 +52,13 @@ export class TargetService {
 
   public setObjectsOnClick(
     mainComponentModel: MainComponentModel,
-    myClickPoint: THREE.Vector3
+    myClickPoint: Vector3
   ): void {
     this._setStepper(mainComponentModel, myClickPoint);
     mainComponentModel.target.targetOnClick = myClickPoint;
-    const dist = myClickPoint.distanceTo(new THREE.Vector3(0, 0, 0));
+    const dist = myClickPoint.distanceTo(new Vector3(0, 0, 0));
     if (dist < 1) {
-      mainComponentModel.target.cameraOnClick = new THREE.Vector3(1, 1, 1);
+      mainComponentModel.target.cameraOnClick = new Vector3(1, 1, 1);
     } else {
       const ratio = (dist + 1) / dist;
       mainComponentModel.target.cameraOnClick = myClickPoint
@@ -92,7 +87,7 @@ export class TargetService {
         mainComponentModel.camera.position.copy(
           mainComponentModel.target.cameraOnClick
         );
-        mainComponentModel.camera.up = new THREE.Vector3(0, 0, 1);
+        mainComponentModel.camera.up = new Vector3(0, 0, 1);
         mainComponentModel.target.targetOnClick = null;
       }
     }
@@ -100,7 +95,7 @@ export class TargetService {
 
   private _setStepper(
     mainComponentModel: MainComponentModel,
-    myClickPoint: THREE.Vector3
+    myClickPoint: Vector3
   ): void {
     let step = mainComponentModel.trackballControls.controls.target
       .clone()
@@ -113,15 +108,16 @@ export class TargetService {
 
   private _getNewPosition(mainComponentModel: MainComponentModel): void {
     // displacement for target
-    const displacementForTarget = new THREE.Vector3().subVectors(
+    const displacementForTarget = new Vector3().subVectors(
       mainComponentModel.target.targetOnClick,
       mainComponentModel.trackballControls.controls.target
     );
-    const newPositionForTarget = mainComponentModel.trackballControls.controls.target
-      .clone()
-      .add(
-        displacementForTarget.divideScalar(mainComponentModel.target.stepper)
-      );
+    const newPositionForTarget =
+      mainComponentModel.trackballControls.controls.target
+        .clone()
+        .add(
+          displacementForTarget.divideScalar(mainComponentModel.target.stepper)
+        );
     mainComponentModel.trackballControls.controls.target.copy(
       newPositionForTarget
     );
@@ -129,7 +125,7 @@ export class TargetService {
       mainComponentModel.trackballControls.controls.target
     );
     // displacement for camera
-    const displacementForCamera = new THREE.Vector3().subVectors(
+    const displacementForCamera = new Vector3().subVectors(
       mainComponentModel.target.cameraOnClick,
       mainComponentModel.camera.position
     );
@@ -140,8 +136,8 @@ export class TargetService {
       );
     mainComponentModel.camera.position.copy(newPositionForCamera);
     // rotation for camera
-    const upForCamera = new THREE.Vector3().subVectors(
-      new THREE.Vector3(0, 0, 1),
+    const upForCamera = new Vector3().subVectors(
+      new Vector3(0, 0, 1),
       mainComponentModel.camera.up
     );
     const newUpForCamera = mainComponentModel.camera.up

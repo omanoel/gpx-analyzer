@@ -1,5 +1,3 @@
-import * as THREE from 'three';
-
 import {
   Component,
   ElementRef,
@@ -12,6 +10,7 @@ import {
 import { TranslateService } from '@ngx-translate/core';
 import { MainComponentModel } from './main.component.model';
 import { MainComponentService } from './main.component.service';
+import { Clock, Object3D, WebGLRenderer } from 'three';
 
 @Component({
   selector: 'app-main',
@@ -25,11 +24,11 @@ export class MainComponent implements OnInit, OnChanges, OnDestroy {
   mouseDown = false;
   isHelpDisplayed = false;
 
-  clock: THREE.Clock = new THREE.Clock();
+  clock: Clock = new Clock();
 
-  currentIntersected: THREE.Object3D;
+  currentIntersected: Object3D;
 
-  renderer: THREE.WebGLRenderer = new THREE.WebGLRenderer({
+  renderer: WebGLRenderer = new WebGLRenderer({
     antialias: true
   });
 

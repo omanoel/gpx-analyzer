@@ -7,7 +7,7 @@ import {
   Output
 } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { EChartsOption, graphic } from 'echarts';
+import { EChartsOption } from 'echarts';
 import { MainComponentModel } from '../@main/main.component.model';
 import { GpxFile, TrackPoint } from '../@shared/gpx-file/gpx-file.model';
 
@@ -113,6 +113,17 @@ export class ChartsComponent implements OnInit {
         return [parseFloat(x), parseFloat(y)];
       }
     );
+    // rdpSimplifiedData
+    this.item.rdpSimplified.trkPoints.sort(
+      (a, b) => a.deltaDistance0 - b.deltaDistance0
+    );
+    const rdpSimplifiedData: number[][] = this.item.rdpSimplified.trkPoints.map(
+      (trkP) => {
+        const x = (trkP[xProperty] as number).toFixed(2);
+        const y = (trkP[yProperty] as number).toFixed(2);
+        return [parseFloat(x), parseFloat(y)];
+      }
+    );
 
     this.options = {
       color: ['#5470C6', '#EE6666'],
@@ -121,7 +132,7 @@ export class ChartsComponent implements OnInit {
         formatter: '{a}: [{c}]'
       },
       legend: {
-        data: ['original', 'interpolated']
+        data: ['original', 'interpolated', 'rdp']
       },
       dataZoom: [
         {
@@ -175,6 +186,12 @@ export class ChartsComponent implements OnInit {
           name: 'interpolated',
           type: chartType,
           data: interpolatedData,
+          smooth: true
+        },
+        {
+          name: 'rdp',
+          type: chartType,
+          data: rdpSimplifiedData,
           smooth: true
         }
       ]
